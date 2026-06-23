@@ -1,70 +1,79 @@
 # agentic-coding
 
-Knowledge, skills, and configuration templates for developing with coding agents — Claude Code, OpenAI Codex, Google Gemini CLI / Antigravity, and Cursor.
+コーディングエージェントを使った開発のナレッジ、スキル、設定テンプレートを蓄積するリポジトリ。
 
-## Overview
+対象エージェントは Claude Code、OpenAI Codex、Google Gemini CLI / Antigravity、Cursor。
 
-This repository accumulates reusable knowledge for agent-driven development across vendors: rule files ([CLAUDE.md](https://code.claude.com/docs/memory) / [AGENTS.md](https://agents.md/) / GEMINI.md), [Agent Skills](https://agentskills.io) (`SKILL.md`), [commands](https://code.claude.com/docs/commands), [hooks](https://code.claude.com/docs/hooks), [MCP servers](https://code.claude.com/docs/mcp), and [settings](https://code.claude.com/docs/settings). Skills are portable Markdown + directories, so the same skill runs across Claude Code, Codex, Cursor, VS Code / GitHub Copilot, and Gemini CLI.
+## 概要
 
-## Structure
+このリポジトリは、ベンダーをまたいだエージェント駆動開発の再利用可能なナレッジを集める。
 
-- **CLAUDE.md** - Main rule file (per-repo instructions)
-- **docs/** - Cross-agent knowledge
-  - `agent-skills.md` - Agent Skills spec, progressive disclosure, cross-vendor adoption
-  - `subagents.md` - Subagent patterns
-  - `coding-agent-github-actions.md` - Running coding agents in CI
-  - `pr-review-bot-workflow.md` - PR review bot
-  - `security.md` - Security guidelines
-- **skills/** - Portable Agent Skills (`SKILL.md` + scripts/references/assets)
-  - `knowledge-note/` - Author a knowledge note
-  - `weekly-report/` - Generate a weekly progress report
-- **.claude/** - Claude Code configuration and language guidelines
-  - `commands/` - Custom slash commands
-  - `skills/` - Claude Code skills
-  - `hooks/` `mcp/` `settings/` - Configuration templates
-  - `architecture/` - Common architecture patterns
-  - `go/` `rust/` `typescript/` - Per-language style, guidelines, and patterns
+扱うのはルールファイル（[CLAUDE.md](https://code.claude.com/docs/memory) / [AGENTS.md](https://agents.md/) / GEMINI.md）、[Agent Skills](https://agentskills.io)（`SKILL.md`）、[コマンド](https://code.claude.com/docs/commands)、[フック](https://code.claude.com/docs/hooks)、[MCP サーバー](https://code.claude.com/docs/mcp)、[設定](https://code.claude.com/docs/settings)。
 
-## Skill portability across agents
+Skill は Markdown とディレクトリだけで構成するため、同じ Skill を Claude Code、Codex、Cursor、VS Code / GitHub Copilot、Gemini CLI で使い回せる。
 
-| Agent | Skill location | Invocation |
-|-------|----------------|------------|
-| Claude Code | `.claude/skills/` | auto / slash command |
-| OpenAI Codex | `.agents/skills/` | auto / `/skills` / `$cmd` |
-| VS Code / GitHub Copilot | `.github/skills/` | auto-detect |
-| Google Antigravity | `.agents/skills/` | auto-detect |
-| Cursor | `SKILL.md` detection | auto / slash command |
+## 構成
 
-A `SKILL.md` body is identical across tools; only the detection directory differs. See `docs/agent-skills.md` for details.
+- **CLAUDE.md** — メインのルールファイル（リポジトリ単位の指示）
+- **docs/** — エージェント横断のナレッジ
+  - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
+  - `subagents.md` — サブエージェントのパターン
+  - `coding-agent-github-actions.md` — CI でのコーディングエージェント運用
+  - `pr-review-bot-workflow.md` — PR レビュー bot
+  - `security.md` — セキュリティガイドライン
+- **skills/** — 可搬な Agent Skills（`SKILL.md` + scripts / references / assets）
+  - `knowledge-note/` — ナレッジノートを書く
+  - `weekly-report/` — 週次の進捗報告を作る
+  - `japanese-tech-writing/` — 日本語技術文書のライティング規範
+- **.claude/** — Claude Code の設定と言語別ガイドライン
+  - `commands/` — カスタムスラッシュコマンド
+  - `skills/` — Claude Code の Skill
+  - `hooks/` `mcp/` `settings/` — 設定テンプレート
+  - `architecture/` — 共通のアーキテクチャパターン
+  - `go/` `rust/` `typescript/` — 言語別のスタイル、ガイドライン、パターン
 
-## Commands
+## エージェント間での Skill 可搬性
 
-| Command | Description |
-|---------|-------------|
-| `/review` | Review code changes in current branch |
-| `/explain` | Explain code in a file |
-| `/test` | Run tests for the project |
-| `/lint` | Run linter for the project |
-| `/format` | Format code in the project |
-| `/build` | Build the project |
-| `/status` | Show git status |
+| エージェント | Skill 配置 | 呼び出し |
+|---|---|---|
+| Claude Code | `.claude/skills/` | 自動 / スラッシュコマンド |
+| OpenAI Codex | `.agents/skills/` | 自動 / `/skills` / `$cmd` |
+| VS Code / GitHub Copilot | `.github/skills/` | 自動検出 |
+| Google Antigravity | `.agents/skills/` | 自動検出 |
+| Cursor | `SKILL.md` を検出 | 自動 / スラッシュコマンド |
 
-## Skills
+`SKILL.md` の本文はツール間で同一で、検出するディレクトリだけが異なる。詳細は `docs/agent-skills.md` を参照。
 
-| Skill | Description |
-|-------|-------------|
-| `/refactor <target>` | Refactor specified code |
-| `/fix <issue>` | Fix a reported issue |
-| `/doc <target>` | Generate documentation |
-| `/add <feature>` | Add a new feature |
-| `/search <term>` | Search codebase for term |
-| `/rename <old> <new>` | Rename across codebase |
-| `/debug <issue>` | Debug an issue |
-| `/commit-message` | Generate commit message from staged changes |
-| `/diagram <target>` | Create ASCII diagram |
-| `/migrate <target>` | Migrate code to new version/framework |
-| `/security <target>` | Security audit |
+## コマンド
 
-## Usage
+| コマンド | 説明 |
+|---|---|
+| `/review` | 現在のブランチの変更をレビューする |
+| `/explain` | ファイル内のコードを説明する |
+| `/test` | プロジェクトのテストを実行する |
+| `/lint` | プロジェクトのリンターを実行する |
+| `/format` | プロジェクトのコードを整形する |
+| `/build` | プロジェクトをビルドする |
+| `/status` | git の状態を表示する |
 
-Apply the contents of this repository to your project so coding agents generate and review code following consistent conventions, and reuse the portable skills across any supported agent.
+## スキル
+
+| スキル | 説明 |
+|---|---|
+| `/refactor <target>` | 指定したコードをリファクタリングする |
+| `/fix <issue>` | 報告された問題を修正する |
+| `/doc <target>` | ドキュメントを生成する |
+| `/add <feature>` | 新機能を追加する |
+| `/search <term>` | コードベースを検索する |
+| `/rename <old> <new>` | コードベース全体で名前を変更する |
+| `/debug <issue>` | 問題をデバッグする |
+| `/commit-message` | ステージした変更からコミットメッセージを生成する |
+| `/diagram <target>` | ASCII 図を作成する |
+| `/migrate <target>` | コードを新しいバージョン/フレームワークへ移行する |
+| `/security <target>` | セキュリティ監査を行う |
+
+## 使い方
+
+このリポジトリの内容をプロジェクトに適用すると、コーディングエージェントが一貫した規約に従ってコードを生成・レビューする。
+
+可搬なスキルは、対応する任意のエージェントで再利用できる。
