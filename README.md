@@ -24,7 +24,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 - **skills/** — 可搬な Agent Skills（`SKILL.md` + scripts / references / assets）
   - `knowledge-note/` — ナレッジノートを書く
   - `weekly-report/` — 週次の進捗報告を作る
-  - `japanese-tech-writing/` — 日本語技術文書のライティング規範
+  - `japanese-tech-writing/` — 日本語技術文書のライティング規範（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d)、Unlicense）
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill
