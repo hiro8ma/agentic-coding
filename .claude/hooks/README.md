@@ -2,6 +2,14 @@
 
 [Hooks](https://code.claude.com/docs/hooks) allow you to run custom commands at various points during Claude Code execution.
 
+## 実装済み Hook
+
+### leak-scan（公開リポのリーク検査）
+
+`leak-scan.py` は PreToolUse(Bash) で動く。`git commit` を含むコマンドのとき、ステージ済み差分の追加行を検査する。API キー、ローカルパス、現職 org / リポ名、個人メールを検出したら exit 2 で commit をブロックし、該当箇所を Claude へ返す。
+
+`.claude/settings.json` で登録済み。git commit 以外のコマンド、JSON でない入力、git 差分が取れない場合は通す。検出スクリプト自身はパターン文字列を含むため、スキャン対象から除外している。
+
 ## Configuration
 
 Add hooks to `.claude/settings.json`:
