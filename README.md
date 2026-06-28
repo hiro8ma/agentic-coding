@@ -17,6 +17,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 - **CLAUDE.md** — メインのルールファイル（リポジトリ単位の指示）
 - **docs/** — エージェント横断のナレッジ
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
+  - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `subagents.md` — サブエージェントのパターン
   - `coding-agent-github-actions.md` — CI でのコーディングエージェント運用
   - `pr-review-bot-workflow.md` — PR レビュー bot
