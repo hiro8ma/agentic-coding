@@ -10,7 +10,7 @@ tags: [claude-code, plugins, skills, subagents, hooks, mcp, marketplace, extensi
 
 Claude Code には 4 つの拡張ポイントがある。Skills は手順を会話に注入し、Subagents は作業を別コンテキストへ委譲し、Hooks はイベントで決定論的にスクリプトを実行し、MCP は外部サービスへ接続する。プラグインはこの 4 つを詰めて配布する「箱」で、中身は自由に組み合わせられる。公式スキルはマーケットプレイス（`anthropics/skills`）から `/plugin` で導入し、`~/.claude/plugins/cache/` に展開される。
 
-各論は [[agent-skills]]（Skills の仕様と配布）と [[subagents]]（コンテキスト分離）に分ける。本ノートは 4 点の役割分担とプラグインの全体像に絞る。
+各論は [[agent-skills]]（Skills の仕様と配布）、[[subagents]]（コンテキスト分離）、[[context-design]]（コンテキスト全体の責務分離）に分ける。本ノートは 4 点の役割分担とプラグインの全体像に絞る。
 
 ## 4 つの拡張ポイント
 

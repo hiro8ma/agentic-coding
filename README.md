@@ -17,6 +17,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 - **CLAUDE.md** — メインのルールファイル（リポジトリ単位の指示）
 - **docs/** — エージェント横断のナレッジ
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
+  - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `design-skills.md` — frontend-design / theme-factory / canvas-design と転用できる設計哲学
   - `subagents.md` — サブエージェントのパターン
@@ -27,6 +28,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `knowledge-note/` — ナレッジノートを書く
   - `weekly-report/` — 週次の進捗報告を作る
   - `japanese-tech-writing/` — 日本語技術文書のライティング規範（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d)、Unlicense）
+  - `context-audit/` — CLAUDE.md / AGENTS.md / Skills / MCP / Hooks / Subagents のコンテキスト監査
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill
@@ -73,6 +75,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 | `/diagram <target>` | ASCII 図を作成する |
 | `/migrate <target>` | コードを新しいバージョン/フレームワークへ移行する |
 | `/security <target>` | セキュリティ監査を行う |
+| `/context-audit <target>` | コンテキスト設計を監査する |
 
 ## 使い方
 
