@@ -182,6 +182,8 @@ src/api/login.ts の login 関数だけを確認してください。
 - `docs/agent-skills.md`
 - `docs/subagents.md`
 - `docs/plugins-and-extension-points.md`
+- `docs/spec-driven-development.md`
 - `.claude/hooks/README.md`
 - `.claude/mcp/README.md`
 - `skills/context-audit/SKILL.md`
+- `skills/spec-workflow/SKILL.md`

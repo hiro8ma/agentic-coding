@@ -26,6 +26,7 @@ Place `.md` files in `.claude/skills/` directory. Use `$ARGUMENTS` placeholder f
 | `/migrate <target>` | Migrate code |
 | `/security <target>` | Security audit |
 | `/context-audit <target>` | Audit context design across rules, Skills, MCP, hooks, and subagents |
+| `/spec-workflow <target>` | docs/ と .steering/ に仕様駆動開発ドキュメントを作成・更新する |
 
 ## Creating Skills
 
