@@ -1,0 +1,17 @@
+{
+  "$comment": "safe-write-pattern: 読み取り専用の GitHub MCP 接続。トリアージ・調査ループにはこちらを使う。出典 cobusgreyling/loop-engineering examples/mcp",
+  "mcpServers": {
+    "github-readonly": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e", "GITHUB_READ_ONLY=1",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_READONLY_TOKEN}"
+      }
+    }
+  }
+}

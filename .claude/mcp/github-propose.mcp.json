@@ -1,0 +1,17 @@
+{
+  "$comment": "safe-write-pattern: PR 提案までを許可する GitHub MCP 接続。ブランチ作成と PR 作成は可、マージ・main 直 push・リポ設定変更は不可のトークンを使う。実行系ループ（L2）にはこちらを使う。出典 cobusgreyling/loop-engineering examples/mcp",
+  "mcpServers": {
+    "github-propose": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e", "GITHUB_TOOLSETS=repos,issues,pull_requests",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PROPOSE_TOKEN}"
+      }
+    }
+  }
+}

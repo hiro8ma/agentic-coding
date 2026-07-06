@@ -86,10 +86,12 @@ Implementer と Verifier の分離（メーカー / チェッカー）、Human G
 | loop-context | ステートフルなメモリ管理と回路遮断 |
 | loop-mcp-server | パターン / スキル / 状態の MCP ランタイム |
 
-## このリポジトリでの適用先
+## このリポジトリでの適用（実施済み）
 
-- ナレッジのリンク切れ検査、README とディレクトリ実態の乖離検出は Daily Triage パターンの題材になる
-- 自作エージェント（agent/ts）の Action 層（GitHub Actions 統合）は「ループの器」の自作にあたり、LOOP.md / STATE.md の分離を設計に借りられる
+- **docs-triage ループを L1 で運用中** — ルート直下の `LOOP.md`（宣言）/ `STATE.md`（状態）/ `loop-budget.md`（上限）/ `loop-run-log.md`（記録）+ `.github/workflows/daily-triage.yml`。ナレッジのリンク切れと README とディレクトリ実態の乖離を週次で検査し、Issue 起票のみ行う（LLM 不使用の決定論的チェック）
+- **ループ設計チェックリスト** — 作る前の 10 観点は [[loop-design-checklist]] を参照
+- **MCP の safe-write-pattern** — `.claude/mcp/github-readonly.mcp.json`（調査用）と `github-propose.mcp.json`（PR 提案用、マージ不可）を権限レベル別に分離
+- 自作エージェント（agent/ts）の Action 層（GitHub Actions 統合）は「ループの器」の自作にあたり、LOOP.md / STATE.md の分離を設計に借りる
 - CI でのエージェント運用は [[coding-agent-github-actions]]、Implementer / Verifier 分離は [[subagents]] を参照
 
 ## 参考
