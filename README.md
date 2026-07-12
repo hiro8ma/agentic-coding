@@ -32,6 +32,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `context-audit/` — CLAUDE.md / AGENTS.md / Skills / MCP / Hooks / Subagents のコンテキスト監査
   - `spec-workflow/` — docs / .steering を使うスペック駆動開発ワークフロー
   - `brand-template/` — ブランド（配色・書体・トンマナ）を成果物に自動適用するガードレール型スキルのテンプレート
+  - `slack-post/` — Slack 投稿文の作成・整形規範（プラットフォーム制約内蔵型）
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill
