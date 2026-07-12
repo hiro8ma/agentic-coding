@@ -137,6 +137,55 @@ canvas-design の哲学ファイルはセクション分割（色彩 / 空間構
 
 再現性のため、最終画像だけでなく中間成果物（デザイン哲学・ブランド定義・色コード・Canvas API コード・バージョン）を残す。
 
+## algorithmic-art と slack-gif-creator — スクリプトの要否という設計判断
+
+題材はアートと GIF だが、主題はスキルアーキテクチャの分岐基準にある。
+
+| 観点 | algorithmic-art | slack-gif-creator |
+|---|---|---|
+| 出力 | p5.js のインタラクティブ HTML | Slack 用アニメーション GIF |
+| 構成 | SKILL.md + テンプレートのみ | Python スクリプト 4 本が必須 |
+| 再現性 | シード値（同じシードで完全再現） | 固定パラメータ + フレーム生成 |
+| 検証 | UI と出力仕様で担保 | validators.py で自動検証 |
+
+分岐基準は出力形式。
+LLM が直接生成できる形式（Markdown / HTML / JS / CSS / JSON）はスクリプト不要。
+専用処理が要るバイナリ形式（GIF / 動画 / 音声 / 圧縮）はスクリプト必須（エンコード・カラー最適化・サイズ制御は指示だけでは安定しない）。
+自作時は「まずスクリプトなしで実現できるか」を検討し、足りるなら単純な構成を選ぶ。
+
+### スキルの 4 層分担（一般則）
+
+| 層 | 担当 | 例 |
+|---|---|---|
+| 知識・方針 | SKILL.md | Slack の寸法・色数・FPS 制約、アニメーションパターン |
+| 構造の統一 | テンプレート | viewer.html の UI 配置（毎回同じ操作感になる理由） |
+| 計算・変換 | スクリプト | GIF エンコード、イージング、カラー最適化 |
+| 最終判定 | バリデータ | Slack 要件への適合を自動検証 |
+
+「確率的な LLM に任せる部分と、決定的なコードに任せる部分の境界を引く」という原則で、
+leak-scan フック（検証はコード）や評価設計（決定的チェックはコード、意味判定は Judge）と同じ構造。
+
+### プラットフォーム制約の内蔵
+
+slack-gif-creator は Slack の寸法（絵文字 128×128 / メッセージ 480×480）・FPS（10〜30）・色数（48〜128）・再生時間を SKILL.md に埋め込み、ユーザーが毎回仕様を調べなくてよい状態にする。
+brand-guidelines の「読むものから実行されるものへ」と同じ変換を、ブランドでなくプラットフォーム仕様に適用した形。
+特定プラットフォーム向けスキルを作るときは、許容寸法・最大サイズ・命名規則・アップロード要件・バリデーション条件を内蔵する。
+
+### シードランダム性 — 生成系の再現性 2 段階
+
+algorithmic-art の中心はシードランダム性（同じシードなら同じ作品、シードを変えるとバリエーション探索）。
+生成系の再現性確保は 2 段階で使い分ける — 哲学ファイル = 方向性の再現、シード = 完全な再現。
+評価ハーネスで「サンプリングの seed を固定する」のと同じ規律。
+
+### スキル設計の判断手順
+
+1. 出力形式を明確にする
+2. プラットフォーム固有の制約を列挙する
+3. LLM が直接生成できる部分 / テンプレートで統一すべき部分 / スクリプトが必要な処理を切り分ける
+4. バリデーション条件を定義する
+5. 再現性の仕組み（シード・中間成果物）を設ける
+6. 保守コストと品質のバランスを確認する
+
 ## 注意点
 
 - frontend-design の効果はアニメーションやインタラクションに出るため、紙面では伝わりにくい。ブラウザで確認する
@@ -150,3 +199,5 @@ canvas-design の哲学ファイルはセクション分割（色彩 / 空間構
 - Improving frontend design through skills — https://claude.com/blog/improving-frontend-design-through-skills
 - anthropics/skills — theme-factory — https://github.com/anthropics/skills/tree/main/skills/theme-factory
 - anthropics/skills — canvas-design — https://github.com/anthropics/skills/tree/main/skills/canvas-design
+- anthropics/skills — algorithmic-art — https://github.com/anthropics/skills/tree/main/skills/algorithmic-art
+- anthropics/skills — slack-gif-creator — https://github.com/anthropics/skills/tree/main/skills/slack-gif-creator
