@@ -33,6 +33,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `spec-workflow/` — docs / .steering を使うスペック駆動開発ワークフロー
   - `brand-template/` — ブランド（配色・書体・トンマナ）を成果物に自動適用するガードレール型スキルのテンプレート
   - `slack-post/` — Slack 投稿文の作成・整形規範（プラットフォーム制約内蔵型）
+  - `cognitive-rhythm-writing/` — 長文解説に読み進める推進力を持たせる認知リズム設計（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) の要旨を再構成。japanese-tech-writing と併用）
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill
