@@ -7,6 +7,7 @@ description: 完成した文書を、執筆コンテキストを持たないサ�
 
 anthropics/skills の doc-coauthoring が持つ Stage 3（読者テスト）を単体スキルとして切り出したもの。
 共同執筆のプロセスを経ていない文書（既に書き上がった ADR・README・ナレッジ）にも適用できる。
+正典は agentic-coding リポの `skills/reader-test/` で版管理し、`~/.claude/skills/reader-test/` にはそのコピーを置く。
 
 ## 原理
 
