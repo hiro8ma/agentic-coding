@@ -1,0 +1,22 @@
+{
+  "kube_context": "agentlab",
+  "target": {
+    "path": "deployment/demo-app",
+    "namespace": "agentlab"
+  },
+  "feature": {
+    "env": true,
+    "fs": "read",
+    "network": {
+      "incoming": {
+        "mode": "steal",
+        "port_mapping": [[18080, 8080]],
+        "http_filter": {
+          "header_filter": "baggage:.*mirrord-session=lab-session.*"
+        }
+      },
+      "outgoing": true,
+      "dns": true
+    }
+  }
+}

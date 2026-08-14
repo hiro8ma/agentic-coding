@@ -91,6 +91,35 @@ kubectl --context=agentlab -n agentlab run c --rm -i --restart=Never \
 
 クラスタ内から Service を叩いた応答の `hostname` がローカルマシン名になり、Pod ではなく手元のプロセスが処理したことが分かる。
 
+## 検証 5 — フィルタ付き steal（共有クラスタでも使える形）
+
+フィルタなしの steal は対象 Pod への全リクエストを奪うため、共有クラスタでは使えない。
+`http_filter` で自分のセッションのヘッダを持つリクエストだけを横取りすれば、他人のトラフィックは Pod が処理し続ける。
+
+```bash
+MIRRORD_CONFIG_FILE=.mirrord/steal-filtered.json PORT=18080 mirrord exec -- /tmp/labdemo &
+
+# A. ヘッダなし（他人のリクエスト相当）→ Pod が応答
+kubectl --context=agentlab -n agentlab run f1 --rm -i --restart=Never \
+  --image=curlimages/curl:8.11.1 -- -s http://demo-app.agentlab.svc.cluster.local
+
+# B. 自分のセッションヘッダあり → ローカルが応答
+kubectl --context=agentlab -n agentlab run f2 --rm -i --restart=Never \
+  --image=curlimages/curl:8.11.1 -- -s \
+  -H "baggage: mirrord-session=lab-session" http://demo-app.agentlab.svc.cluster.local
+```
+
+実測結果。
+
+| リクエスト | 応答した主体 |
+|---|---|
+| ヘッダなし | Pod（`demo-app-...` / pid 1） |
+| `baggage: mirrord-session=lab-session` あり | ローカル（`mac.lan` / pid 46846） |
+
+セッションキーは `{{ get_env(name='USER') }}` のテンプレートで各自の値に展開できるため、設定ファイルはチームで共有したまま分離キーだけを個人ごとに変えられる。
+フィルタ付き steal 自体は OSS 版で使える。
+有償の Operator が必要になるのは、同一 Pod に対して複数人が**同時に**セッションを張る場合。
+
 ## 躓いた点
 
 1. **設定ファイルが CLI フラグを上書きする。** `"incoming": "mirror"` を書いた設定で `--steal` を渡しても mirror のままになる。モードごとに設定ファイルを分けるのが確実
@@ -117,10 +146,48 @@ k8s/manifests.yaml   # namespace / ConfigMap / Secret / upstream / demo-app
 .mirrord/steal.json    # steal モード + port_mapping
 ```
 
+## セキュリティ上の検討事項
+
+インナーループの改善は「本番相当の Secret を開発者マシンに降ろす」ことと表裏一体になる。
+組織で導入するなら `feature.env.exclude` で降ろさない環境変数を決めるのが必須の設計項目。
+
+```json
+"env": {
+  "include": "DATABASE_USER;PUBLIC_ENV",
+  "exclude": "DATABASE_PASSWORD;SECRET_ENV"
+}
+```
+
+`feature.fs.mode` も同様に、ソースコードはローカル、設定ファイルはリモート、と正規表現で振り分けられる。
+
 ## 次の段階
 
-アウターループ側（PR ごとにワークロードを複製してプレビュー URL を払い出す）は Signadot が担当する領域で、コントロールプレーンのアカウントと Operator の導入が必要になる。
-このラボはインナーループのみを対象にしている。
+アウターループ側（PR ごとにワークロードを複製してプレビュー URL を払い出す）は Signadot が担当する領域。
+無料の Starter プラン（クラスタ 1 つ、Sandbox 作成 50 回/月）があり、ローカルクラスタでも試せる。
+Operator の導入にはダッシュボードでのクラスタトークン発行が要る（トークンは初回のみ表示）。
+
+```bash
+helm repo add signadot https://charts.signadot.com
+helm install signadot-operator signadot/operator \
+  --set controlPlane.clusterToken='<cluster-token>'
+```
+
+サービスメッシュ未導入の環境では、Signadot 独自の DevMesh を前提とした構成を選ぶ。
+
+## エージェントに渡す形にする
+
+MetalBear が Agent Skills 形式のスキル集（`metalbear-co/skills`、9 種）と、エージェント前提のサンプルリポジトリ（`metalbear-co/playground`）を公開している。
+playground には `AGENTS.md` と `.mirrord/` が最初から入っており、「エージェントがコードを書く前にクラスタ文脈で検証してから PR を出す」ループの実例になっている。
+
+```bash
+/plugin marketplace add metalbear-co/skills
+/plugin install mirrord@mirrord-skills
+```
+
+公式が明示している安全ガードは 3 つ。
+本番クラスタを対象にしない。
+用意された設定ファイル（フィルタ入り）を必ず使う。
+エージェントごとにセッション識別子を分ける。
 
 ## 参考
 
