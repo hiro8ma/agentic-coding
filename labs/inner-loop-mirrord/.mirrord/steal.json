@@ -1,0 +1,24 @@
+{
+  "kube_context": "agentlab",
+  "target": {
+    "path": "deployment/demo-app",
+    "namespace": "agentlab"
+  },
+  "feature": {
+    "env": true,
+    "fs": "read",
+    "network": {
+      "incoming": {
+        "mode": "steal",
+        "port_mapping": [
+          [
+            18080,
+            8080
+          ]
+        ]
+      },
+      "outgoing": true,
+      "dns": true
+    }
+  }
+}
