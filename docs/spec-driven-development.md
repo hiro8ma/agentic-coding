@@ -286,6 +286,27 @@ SDD は特定ツールの機能ではなく、業界標準ワークフローに�
 | リポジトリ内成果物 | Spec Kit / Kiro | 中（Spec Kit はクロスアーティファクト整合性分析を標準搭載） |
 | 仕様を正とする常時同期 | Tessl spec-as-source | 高（仕様とコードを常時同期） |
 
+### 仕様成熟度の 3 段階（Spec-First / Spec-Anchored / Spec-as-Truth）
+
+上の「仕様の寿命」の階層は、Rushikesh Samaiahgare の 3 段階分類（2026-04-11）として名前がついている。
+
+| 段階 | 定義 |
+|---|---|
+| Spec-First | 仕様を先に書いて構築する。コード生成後に仕様は放置されがちで、保守対象はコードのまま |
+| Spec-Anchored | 仕様をコードと並ぶバージョン管理された成果物として生かし続け、CI/CD で相互チェックする。乖離するとビルドが落ちる |
+| Spec-as-Truth | 仕様が唯一の成果物で、コードは再生成される出力。人間が直接コードをリファクタリングしない |
+
+第 3 段階を「Spec-as-Source」と表記する派生（AsiaOstrich/universal-dev-standards 等）もあり、Tessl の spec-as-source と同じ層を指す。
+
+原典は適用判断を 3 つの問いに落としている。
+
+1. 複数のチームやエージェントが合意する必要があるか。なければ Spec-First に留める
+2. システムが構築チームより長く存続するか。するなら Spec-Anchored
+3. 多言語実装または規制対応が必要か。必要なら Spec-as-Truth
+
+実務採用の例として、Dress Code 社は「レベル 2（Anchored）まで」を明示的に採用方針にしている（AI DevEx Conference 2026 の講演）。
+仕様と意思決定記録（ADR）を残すことで「AI が読める事実がコード成果物側に 100% 残る」状態を作る、という位置づけで、SDD を単独のワークフローではなく SSoT 戦略の一部として説明している点が特徴的だった。
+
 批判側の論点も整理されてきた。
 「ウォーターフォールの再来」批判に対しては、フィードバックループが四半期単位だった当時と違い SDD のループは分から時間単位で回る、という反論が主流になっている。
 一方で、ソロ開発・5 人未満チーム・要件が高速に変わる探索フェーズでは仕様書作成コストが回収できない、という限界論は共通見解として残る。
@@ -309,3 +330,5 @@ Vibe Coding は発見速度、SDD は本番の耐久性を提供する、とい�
 - Codex AGENTS.md — https://developers.openai.com/codex/guides/agents-md
 - Vibe Coding vs SDD — https://www.infoworld.com/article/4166817/vibe-coding-or-spec-driven-development-how-to-choose.html
 - Tessl spec-as-source — https://tessl.io/blog/tessl-launches-spec-driven-framework-and-registry/
+- Spec-First / Spec-Anchored / Spec-as-Truth（3 段階分類の原典） — https://www.rushis.com/spec-first-spec-anchored-spec-as-truth-the-three-levels-of-spec-driven-development/
+- 変更し続けられるシステムをどう保つか — AI 時代の SSoT という設計原則（Dress Code、AI DevEx Conference 2026） — https://speakerdeck.com/kawauso/bian-geng-sisok-kerarerusisutemuwodoubao-tuka-aishi-dai-nossottoiushe-ji-yuan-ze
