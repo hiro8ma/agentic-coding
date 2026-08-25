@@ -1,0 +1,8 @@
+{
+  "name": "verification",
+  "version": "1.0.0",
+  "description": "実装や設定が本当に効いているかを確かめる。機構の対照実験、文書の読者テスト、クラスタでの実文脈検証、プロジェクト設定の棚卸し。",
+  "author": { "name": "hiro8ma", "url": "https://github.com/hiro8ma" },
+  "repository": "https://github.com/hiro8ma/agentic-coding",
+  "license": "MIT"
+}

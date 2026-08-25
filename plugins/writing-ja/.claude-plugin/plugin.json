@@ -1,0 +1,8 @@
+{
+  "name": "writing-ja",
+  "version": "1.0.0",
+  "description": "日本語の技術文書を書くための規範。文章の作法、読み進める推進力の設計、学習内容の構造化。",
+  "author": { "name": "hiro8ma", "url": "https://github.com/hiro8ma" },
+  "repository": "https://github.com/hiro8ma/agentic-coding",
+  "license": "MIT"
+}
