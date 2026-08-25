@@ -8,19 +8,19 @@
     {
       "name": "business-tools",
       "description": "定型書類を組み立てる。見積書の PDF 作成、週次報告、Slack 投稿文の整形。",
-      "source": { "source": "github", "repo": "hiro8ma/agentic-coding" },
+      "source": "./plugins/business-tools",
       "homepage": "https://github.com/hiro8ma/agentic-coding"
     },
     {
       "name": "verification",
       "description": "実装や設定が本当に効いているかを確かめる。機構の対照実験、文書の読者テスト、クラスタでの実文脈検証、プロジェクト設定の棚卸し。",
-      "source": { "source": "github", "repo": "hiro8ma/agentic-coding" },
+      "source": "./plugins/verification",
       "homepage": "https://github.com/hiro8ma/agentic-coding"
     },
     {
       "name": "writing-ja",
       "description": "日本語の技術文書を書くための規範。文章の作法、読み進める推進力の設計、学習内容の構造化。",
-      "source": { "source": "github", "repo": "hiro8ma/agentic-coding" },
+      "source": "./plugins/writing-ja",
       "homepage": "https://github.com/hiro8ma/agentic-coding"
     }
   ]
