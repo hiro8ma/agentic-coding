@@ -6,6 +6,7 @@ metadata:
   author: "k16shikano"
   license: "Unlicense（著者が gist コメントで宣言、2026-06-24 確認）"
   note: "原文の規範を蒸留したもの。正典は source URL を参照"
+paths: ["knowledge/**/*.md", "docs/**/*.md", "**/ADR*.md", "**/adr*.md"]
 ---
 
 # 日本語技術文書ライティング規範

@@ -1,6 +1,7 @@
 ---
 name: cluster-verify
 description: Kubernetes 上で動くサービスの変更を、PR を出す前にクラスタの実文脈（環境変数・Secret・クラスタ内 DNS・依存サービス）で検証する。mirrord でローカルプロセスをクラスタに接続し、失敗したら直して再実行するループを回す。「クラスタで検証して」「mirrord で確認」「PR 前に実環境で試して」等で起動。
+paths: ["**/k8s/**/*.yaml", "**/manifests/**/*.yaml", "**/.mirrord/*.json", "**/skaffold.yaml"]
 ---
 
 # cluster-verify — PR を出す前にクラスタの実文脈で検証する

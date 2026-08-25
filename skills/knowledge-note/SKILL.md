@@ -1,6 +1,7 @@
 ---
 name: knowledge-note
 description: 学習教材・記事・書籍の内容を、面接で語れる粒度の構造化ナレッジ（フロントマター + TL;DR + 要点 + 自分の実装との接続 + 出典）に整理する。「ナレッジ化」「学習メモ」「この記事をまとめて」「knowledge note」等のキーワードで起動。
+paths: ["knowledge/**/*.md", "docs/**/*.md"]
 ---
 
 # 学習ナレッジ化スキル
