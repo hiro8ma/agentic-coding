@@ -10,3 +10,6 @@
 *.pfx
 secrets/
 credentials/
+
+__pycache__/
+*.pyc

@@ -1,0 +1,19 @@
+{
+  "client": "株式会社サンプル商事",
+  "subject": "コーポレートサイト リニューアル一式",
+  "estimate_no": "EST-20260825-001",
+  "issue_date": "2026-08-25",
+  "valid_days": 30,
+  "items": [
+    {"name": "トップページデザイン", "unit_price": 200000, "quantity": 1, "unit": "式", "note": "PC・SP 含む"},
+    {"name": "下層ページデザイン", "unit_price": 80000, "quantity": 6, "unit": "ページ"},
+    {"name": "トップページコーディング", "unit_price": 120000, "quantity": 1, "unit": "式"},
+    {"name": "下層ページコーディング", "unit_price": 50000, "quantity": 6, "unit": "ページ"},
+    {"name": "フォーム実装", "unit_price": 80000, "quantity": 1, "unit": "式", "note": "確認画面・自動返信込み"},
+    {"name": "WordPress 初期構築", "unit_price": 180000, "quantity": 1, "unit": "式"},
+    {"name": "記事移行", "unit_price": 3000, "quantity": 40, "unit": "記事"},
+    {"name": "要件定義・設計", "unit_price": 60000, "quantity": 2.5, "unit": "人日"},
+    {"name": "ディレクション費", "unit_price": 15, "unit": "％"}
+  ],
+  "remarks": "公開後 1 か月間の軽微な修正対応を含みます。"
+}
