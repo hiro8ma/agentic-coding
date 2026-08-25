@@ -1,1 +1,12 @@
 .claude/settings.local.json
+
+# シークレット（golang-security の secrets ルール）
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
