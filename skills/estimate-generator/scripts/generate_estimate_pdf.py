@@ -17,6 +17,7 @@ Chrome は macOS なら大抵入っており、追加の導入が要らない。
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -137,39 +138,39 @@ def render_html(data: dict) -> str:
     return f"""<!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <style>
-  @page {{ size: A4 portrait; margin: 18mm 16mm; }}
+  @page {{ size: A4 portrait; margin: 12mm 14mm; }}
   * {{ box-sizing: border-box; }}
   body {{
     font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-    font-size: 10pt; color: #111; line-height: 1.6; margin: 0;
+    font-size: 9pt; color: #111; line-height: 1.4; margin: 0;
   }}
-  h1 {{ font-size: 22pt; letter-spacing: 8px; text-align: center; margin: 0 0 10mm; }}
-  .meta {{ display: flex; justify-content: space-between; margin-bottom: 8mm; }}
+  h1 {{ font-size: 18pt; letter-spacing: 6px; text-align: center; margin: 0 0 6mm; }}
+  .meta {{ display: flex; justify-content: space-between; margin-bottom: 5mm; }}
   .client {{ width: 55%; }}
   .client .to {{ font-size: 14pt; border-bottom: 1.5px solid #111; padding-bottom: 3mm; margin-bottom: 4mm; }}
   .issuer {{ width: 42%; font-size: 9pt; text-align: right; }}
   .issuer .name {{ font-size: 11pt; font-weight: 700; margin-bottom: 1mm; }}
   .nums {{ font-size: 9pt; text-align: right; margin-bottom: 4mm; }}
   .total-box {{
-    border: 2px solid #111; padding: 4mm 5mm; margin-bottom: 8mm;
+    border: 2px solid #111; padding: 3mm 5mm; margin-bottom: 5mm;
     display: flex; justify-content: space-between; align-items: baseline;
   }}
   .total-box .label {{ font-size: 11pt; font-weight: 700; }}
   .total-box .value {{ font-size: 18pt; font-weight: 700; }}
-  table {{ width: 100%; border-collapse: collapse; margin-bottom: 6mm; }}
-  th {{ background: #f0f0f0; border: 1px solid #999; padding: 2.5mm; font-size: 9pt; }}
-  td {{ border: 1px solid #999; padding: 2.5mm; }}
+  table {{ width: 100%; border-collapse: collapse; margin-bottom: 4mm; }}
+  th {{ background: #f0f0f0; border: 1px solid #999; padding: 1.8mm 2mm; font-size: 8.5pt; }}
+  td {{ border: 1px solid #999; padding: 1.8mm 2mm; }}
   td.num {{ text-align: right; white-space: nowrap; }}
   td.qty {{ text-align: center; white-space: nowrap; }}
   .note {{ display: block; font-size: 8pt; color: #666; }}
   .summary {{ width: 62mm; margin-left: auto; border-collapse: collapse; }}
-  .summary td {{ border: 1px solid #999; padding: 2.5mm; }}
+  .summary td {{ border: 1px solid #999; padding: 1.8mm 2mm; }}
   .summary td:last-child {{ text-align: right; white-space: nowrap; }}
   .summary tr.total td {{ font-weight: 700; background: #f0f0f0; }}
-  .remarks {{ margin-top: 8mm; }}
+  .remarks {{ margin-top: 5mm; }}
   .remarks h2, .terms h2 {{ font-size: 10pt; margin: 0 0 2mm; }}
-  .remarks p {{ border: 1px solid #999; padding: 3mm; min-height: 18mm; margin: 0; }}
-  .terms {{ margin-top: 8mm; font-size: 9pt; }}
+  .remarks p {{ border: 1px solid #999; padding: 3mm; min-height: 11mm; margin: 0; }}
+  .terms {{ margin-top: 5mm; font-size: 8.5pt; }}
   .terms dl {{ margin: 0; }}
   .terms dt {{ float: left; width: 26mm; clear: left; color: #555; }}
   .terms dd {{ margin: 0 0 1mm 26mm; }}
@@ -225,6 +226,20 @@ def render_html(data: dict) -> str:
 </section>
 
 </body></html>"""
+
+
+def count_pdf_pages(pdf: Path) -> int:
+    """PDF のページ数を数える。
+
+    見積書は 1 枚に収まっているのが望ましいが、
+    レイアウトの崩れは目で見ても気づきにくい。画面で見れば正しく見えるのに、
+    紙面の境界を越えているという壊れ方をするため、機械的に数える。
+    """
+    raw = pdf.read_bytes()
+    counts = [int(x) for x in re.findall(rb"/Count\s+(\d+)", raw)]
+    if counts:
+        return max(counts)
+    return len(re.findall(rb"/Type\s*/Page[^s]", raw))
 
 
 CHROME_CANDIDATES = [
@@ -291,8 +306,19 @@ def main() -> None:
 
     lines, subtotal = build_lines(data["items"])
     tax = (subtotal * TAX_RATE).quantize(Decimal("1"), rounding=ROUND_DOWN)
+    pages = count_pdf_pages(dst)
+
     print(f"PDF 生成完了: {dst}（{engine}）")
     print(f"  明細 {len(lines)} 行 / 小計 {yen(subtotal)} / 税 {yen(tax)} / 合計 {yen(subtotal + tax)}")
+    print(f"  ページ数 {pages}")
+
+    if pages > 1:
+        print(
+            f"\n  警告: {pages} ページになっている。"
+            f"見積書は 1 枚に収めたい。明細 {len(lines)} 行が多いか、備考が長い。\n"
+            f"  対処: 品目をまとめる、備考を短くする、"
+            f"または 2 枚で出す旨をユーザーに伝えて確認を取る。"
+        )
 
 
 if __name__ == "__main__":
