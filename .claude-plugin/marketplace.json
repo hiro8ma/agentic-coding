@@ -1,0 +1,18 @@
+{
+  "name": "hiro8ma-marketplace",
+  "owner": {
+    "name": "hiro8ma",
+    "url": "https://github.com/hiro8ma"
+  },
+  "plugins": [
+    {
+      "name": "business-tools",
+      "description": "見積書の PDF 作成と週次報告の作成。定型書類を対話とテンプレートで組み立てるスキル群。",
+      "source": {
+        "source": "github",
+        "repo": "hiro8ma/agentic-coding"
+      },
+      "homepage": "https://github.com/hiro8ma/agentic-coding"
+    }
+  ]
+}

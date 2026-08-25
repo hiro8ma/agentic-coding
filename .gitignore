@@ -13,3 +13,6 @@ credentials/
 
 __pycache__/
 *.pyc
+
+# .skill パッケージ（生成物）
+dist/

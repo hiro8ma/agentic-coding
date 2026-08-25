@@ -1,0 +1,12 @@
+{
+  "name": "business-tools",
+  "version": "1.0.0",
+  "description": "見積書の PDF 作成と週次報告の作成。定型書類を対話とテンプレートで組み立てるスキル群。",
+  "author": {
+    "name": "hiro8ma",
+    "url": "https://github.com/hiro8ma"
+  },
+  "repository": "https://github.com/hiro8ma/agentic-coding",
+  "license": "MIT",
+  "keywords": ["estimate", "quotation", "invoice", "weekly-report", "pdf", "business"]
+}
