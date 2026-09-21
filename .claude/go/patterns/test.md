@@ -205,3 +205,43 @@ func TestWithoutData(t *testing.T) {
     // dataは不要
 }
 ```
+
+## HTTP サーバのテスト
+
+Go 1.27 以降は `httptest.NewTestServer` を使う。
+ポートを取らないプロセス内の仮想ネットワークで動き、`testing/synctest` とも組み合わせられる。
+
+```go
+srv := httptest.NewTestServer(t, mux)
+client := agentv1connect.NewAgentServiceClient(srv.Client(), srv.URL)
+```
+
+- 後片付けは `t.Cleanup` に自動で登録されるので、`defer srv.Close()` は要らない
+- `srv.Client()` 以外の `http.Client` では届かない。`http.DefaultClient` を使うコードには、クライアントを渡せる口を作る
+- `Close` した後の接続は拒否されず、待ち続ける。「接続先が止まっている」状態を作るなら、閉じたループバックのポートを使い、context に期限を付ける
+
+```go
+l, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
+if err != nil {
+    t.Fatal(err)
+}
+url := "http://" + l.Addr().String()
+_ = l.Close() // 以後この URL への接続は connection refused になる
+```
+
+## 実際の API を呼ぶテスト
+
+API キーがあるときだけ走るテストは、Makefile が `.env` を読み込むと `make test` でも走る。
+無料枠の上限や一時的な混雑で落ち、コードの不具合と見分けがつかなくなる。
+既定のテストではキーを外し、実際に呼ぶテストは別の口にする。
+
+```makefile
+test:
+	env -u GEMINI_API_KEY -u GOOGLE_API_KEY go test -race -timeout 5m ./...
+
+test-live:
+	go test -timeout 10m ./...
+```
+
+`-timeout` は既定の 10 分より短くする。
+待ち続けるテストがあっても、どのテストで止まったかがすぐ出る。
