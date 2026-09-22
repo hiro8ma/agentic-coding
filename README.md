@@ -30,6 +30,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `weekly-report/` — 週次の進捗報告を作る
   - `japanese-tech-writing/` — 日本語技術文書のライティング規範（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d)、Unlicense）
   - `context-audit/` — CLAUDE.md / AGENTS.md / Skills / MCP / Hooks / Subagents のコンテキスト監査
+  - `agent-design-review/` — LLM エージェントのシステムを 5 観点 29 項目で点検し、根拠付きで本番投入の可否を出す設計レビュー
   - `spec-workflow/` — docs / .steering を使うスペック駆動開発ワークフロー
   - `brand-template/` — ブランド（配色・書体・トンマナ）を成果物に自動適用するガードレール型スキルのテンプレート
   - `slack-post/` — Slack 投稿文の作成・整形規範（プラットフォーム制約内蔵型）
