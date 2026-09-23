@@ -30,6 +30,20 @@ package tabWriter
 package http_util
 ```
 
+標準ライブラリと同じ名前のパッケージは作らない。import のたびに別名が要り、どちらを指しているか読み違える。
+
+```go
+// Bad
+package log
+package errors
+
+// Good - 接頭辞で区別する
+package liblog
+package apperrors
+```
+
+サブパッケージは、親の文脈が分かる名前にする。`internal/payment/client` の中身が汎用の `client` なのか、決済の `client` なのかを名前で区別できるようにする。
+
 ## 名前の重複を避ける
 
 ```go

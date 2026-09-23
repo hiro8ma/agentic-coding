@@ -88,3 +88,23 @@ func (s Status) String() string {
     }
 }
 ```
+
+## 定数に型名を前置する
+
+Go の定数にも型名を前に付ける。proto の enum の値（`STATUS_ACTIVE`）とも対応が取りやすくなる。
+
+```go
+type Status int
+
+// Bad
+const (
+    Active Status = iota + 1
+    Inactive
+)
+
+// Good
+const (
+    StatusActive Status = iota + 1
+    StatusInactive
+)
+```

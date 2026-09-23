@@ -58,6 +58,17 @@ usecase/
 └── mock/            # モック（テスト用）
 ```
 
+#### メソッドの形
+
+メソッド名は、対応する RPC の名前と同じにする。
+引数と戻り値は次の形に固定し、中身が空でもリクエストとレスポンスの構造体を定義する。
+
+```go
+func (u *Book) GetBook(ctx context.Context, req *GetBookRequest) (*GetBookResponse, error)
+```
+
+形がそろうと、RPC からユースケースを機械的にたどれる。後からフィールドを足しても、シグネチャが変わらない。
+
 #### 責務
 
 - `repository`、`externalservice`、`domain service`の呼び出し・調整

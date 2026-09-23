@@ -156,3 +156,8 @@ go run golang.org/x/vuln/cmd/govulncheck@latest ./...   # 呼ばれる経路の�
   }
 }
 ```
+
+## Go のバージョンを上げるとき
+
+- バージョンが書いてあるファイル（`go.mod`、Dockerfile、CI の設定、ツールのバージョン指定など）をすべて洗い出し、まとめて上げる。1 か所だけ上げると、ローカルと CI で使う Go が食い違う
+- golangci-lint が新しい Go に対応するまでは、lint が動かないことがある。上げる前に、使っている golangci-lint が対応しているかを確かめる
