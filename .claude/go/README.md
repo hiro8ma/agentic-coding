@@ -21,7 +21,9 @@ go/
 │   ├── init.md              # init()関数
 │   ├── field-tags.md        # フィールドタグ
 │   ├── principles.md        # 設計原則（明確性・単純性・簡潔性）
-│   └── packages.md          # パッケージ設計
+│   ├── packages.md          # パッケージ設計
+│   ├── protobuf.md          # Protocol Buffers
+│   └── logging.md           # ログ
 │
 ├── performance/         # パフォーマンス
 │   └── optimization.md      # 最適化
@@ -39,7 +41,9 @@ go/
 ├── patterns/           # パターン
 │   ├── test.md              # テストパターン
 │   ├── functional-options.md # Functional Options
-│   └── time.md              # 時間処理
+│   ├── time.md              # 時間処理
+│   ├── repository.md        # リポジトリ層
+│   └── mock.md              # モック
 │
 ├── linting/            # リンティング
 │   └── setup.md             # セットアップ

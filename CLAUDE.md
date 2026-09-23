@@ -50,10 +50,10 @@ npm run format              # フォーマット (Prettier)
 | カテゴリ | 内容 |
 |---------|------|
 | [architecture/](.claude/go/architecture/) | プロジェクトレイアウト（cmd, internal, pkg等） |
-| [guidelines/](.claude/go/guidelines/) | インターフェース、並行処理、エラー処理、panic/exit、enum、atomic、globals、init、field-tags、設計原則、パッケージ設計 |
+| [guidelines/](.claude/go/guidelines/) | インターフェース、並行処理、エラー処理、panic/exit、enum、atomic、globals、init、field-tags、設計原則、パッケージ設計、Protocol Buffers、ログ |
 | [performance/](.claude/go/performance/) | 最適化（strconv、容量ヒント、文字列連結等） |
 | [style/](.claude/go/style/) | 命名規則、変数宣言、構造体、フォーマット、リテラル、ドキュメンテーション、インポート、文字列処理 |
-| [patterns/](.claude/go/patterns/) | テスト、Functional Options、時間処理 |
+| [patterns/](.claude/go/patterns/) | テスト、Functional Options、時間処理、リポジトリ層、モック |
 | [linting/](.claude/go/linting/) | golangci-lint設定 |
 | [commands/](.claude/go/commands/) | ビルド、テストコマンド |
 
