@@ -14,7 +14,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 
 ## 構成
 
-- **CLAUDE.md** — メインのルールファイル（リポジトリ単位の指示）
+- **AGENTS.md** — メインのルールファイル（リポジトリ単位の指示。Claude Code、Codex などが読む）
 - **docs/** — エージェント横断のナレッジ
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
   - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
