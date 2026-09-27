@@ -19,6 +19,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `agentic-development-tooling.md` — AI駆動開発ツールの変化、各社に共通する設計と移植時の境界、開発者が担う検証
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
   - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
+  - `codex-project-configuration.md` — Codexのプロジェクト設定、信頼設定、AGENTS.mdの探索順序とサイズ上限
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `design-skills.md` — frontend-design / theme-factory / canvas-design と転用できる設計哲学

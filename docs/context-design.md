@@ -179,6 +179,7 @@ src/api/login.ts の login 関数だけを確認してください。
 
 ## 関連ドキュメント
 
+- `docs/codex-project-configuration.md`
 - `docs/agent-skills.md`
 - `docs/subagents.md`
 - `docs/plugins-and-extension-points.md`
