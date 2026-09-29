@@ -93,6 +93,9 @@ Goal modeは一度の依頼で終わらず、計測やテストの結果を見�
 
 同じ作業でも、どの変更を一つのタスクやPRにまとめるかは人によって異なる
 チームでは、レビューで一つの判断を下せるか、完了をどのテストや実機確認で示すかを先にそろえる
+Issueを作るときは、Goal、Context Pointers、Constraints、Done Whenを本文に必要な深さで残す
+一つのIssueを進めるための調査、実装、テストは作業手順として扱い、それぞれにIssueを作る必要はない
+Linearでは標準のIssueテンプレートに4要素をプレースホルダーとして置けるが、チームの既定テンプレートにするかはIssueの種類を見て決める
 繰り返し必要になる規約は[コンテキスト設計](context-design.md)に沿って`AGENTS.md`やSkillへ移し、今回限りの背景は依頼に残す
 より大きな機能では[仕様駆動開発](spec-driven-development.md)の要求、設計、タスクへ展開する
 
@@ -101,3 +104,4 @@ Goal modeは一度の依頼で終わらず、計測やテストの結果を見�
 - [Codexへの依頼の書き方](https://learn.chatgpt.com/docs/prompting)
 - [Codexのベストプラクティス](https://learn.chatgpt.com/guides/best-practices)
 - [PlanとGoalの使い分け](https://developers.openai.com/cookbook/examples/codex/using_goals_in_codex)
+- [LinearのIssueテンプレート](https://linear.app/docs/issue-templates)
