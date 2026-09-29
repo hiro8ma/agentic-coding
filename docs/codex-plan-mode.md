@@ -59,6 +59,24 @@ Plan modeは、編集を始める前にコードベースを調べ、実装方�
 0件時のボタン状態も検証する
 単一HTMLのアプリなら、関係のない検索APIや別画面の変更を制約に加えない
 
+プランのステップ数やTest Planの項目数だけではタスクの大きさは分からない
+「全削除」にキャンセル、承認、フィルタ中、再読込後、0件時の検証が並んでも、一つの操作を条件ごとに確かめている
+一方、カテゴリ、検索、並び替え、期限表示をまとめたプランは独立した成果と検証を含むため、Issueや実装段階を分ける余地がある
+
+## 計画時の推論強度
+
+Codexの設定にはPlan mode専用の`plan_mode_reasoning_effort`がある
+通常時を`medium`、Plan modeを`high`にする例は次のとおり
+
+```toml
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "high"
+```
+
+この設定は、選択したモデルが`high`をサポートするときに有効で、Plan mode以外の通常設定は`medium`のままになる
+高い推論強度は計画の正確さを保証しない
+影響範囲や移行順序の判断が難しい仕事で試し、応答時間と検証後の手戻りを比べて採用する
+
 ## 操作と実装への移行
 
 Codex CLIでは`/plan`でPlan modeへ切り替えられ、`/plan <依頼>`で切り替えと最初の依頼を同時に送れる
@@ -66,10 +84,12 @@ Codex Appでもモード切り替えから利用できる
 提示されたプランの前提、変更範囲、検証方法を読み、不足があれば修正を依頼する
 方針が定まったら利用している画面の操作に従って実装へ進む
 プランを作ったこと自体は実装の完了を意味しない
+実装中に前提が変わった場合の伝え方は[実行中の介入と委任](codex-execution-steering.md)にまとめた
 
 ## 参照資料
 
 - [Codexへの依頼の書き方](https://learn.chatgpt.com/docs/prompting)
 - [Codexのコマンド](https://learn.chatgpt.com/docs/developer-commands)
+- [Codexの設定リファレンス](https://learn.chatgpt.com/docs/config-file/config-reference)
 - [Codexのベストプラクティス](https://learn.chatgpt.com/guides/best-practices)
 - [PlanとGoalの使い分け](https://developers.openai.com/blog/mastering-codex-remote-for-engineering)

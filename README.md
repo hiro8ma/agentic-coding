@@ -21,6 +21,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
   - `codex-project-configuration.md` — Codexのプロジェクト設定、信頼設定、AGENTS.mdの探索順序とサイズ上限
   - `task-design.md` — エージェントへの依頼に必要な情報、タスクの分割、Plan modeとGoal modeの使い分け
+  - `codex-execution-steering.md` — 実行中の追加指示、中断、委任できる検証環境の整え方
   - `codex-plan-mode.md` — Plan modeで調査、意図合わせ、実装方針のレビューを進める判断基準
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
