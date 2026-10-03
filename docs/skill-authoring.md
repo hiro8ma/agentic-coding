@@ -37,6 +37,10 @@ Agent Skills の仕組みそのものは [agent-skills.md](agent-skills.md) に�
 
 ## skill-creator
 
+CodexにはSystem Skillの`$skill-creator`もある
+再利用と自作の判断、ホストごとの呼び出し設定は[Skillの再利用と移植](skill-reuse-and-portability.md)を参照する
+以下の作成と評価の手順はAnthropic版の説明で、Codex版の機能と同一とは限らない
+
 Anthropic が公式に提供するスキル作成支援スキル。
 新規作成、テスト実行、性能測定、改善までを扱う。
 

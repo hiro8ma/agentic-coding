@@ -18,6 +18,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 - **docs/** — エージェント横断のナレッジ
   - `agentic-development-tooling.md` — AI駆動開発ツールの変化、各社に共通する設計と移植時の境界、開発者が担う検証
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
+  - `skill-reuse-and-portability.md` — Systemと公開Skillの分類、導入前の確認、CodexとClaude Codeへの移植
   - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
   - `codex-project-configuration.md` — Codexのプロジェクト設定、信頼設定、AGENTS.mdの探索順序とサイズ上限
   - `task-design.md` — エージェントへの依頼に必要な情報、タスクの分割、Plan modeとGoal modeの使い分け
@@ -26,6 +27,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `codex-plugins.md` — CodexのPlugin形式、カタログ、導入設定と既存Pluginの共有
+  - `codex-connections-and-schedules.md` — AppsとMCPの権限、実行面、ローカルとクラウドの定期タスク
   - `design-skills.md` — frontend-design / theme-factory / canvas-design と転用できる設計哲学
   - `subagents.md` — サブエージェントのパターン
   - `coding-agent-github-actions.md` — CI でのコーディングエージェント運用

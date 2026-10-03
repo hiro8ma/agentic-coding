@@ -1,6 +1,6 @@
 ---
 name: context-audit
-description: プロジェクトの CLAUDE.md / AGENTS.md / Skills / Commands / MCP / Hooks / Subagents を点検し、コンテキスト肥大化・重複・責務混在を減らす。「コンテキスト監査」「context audit」「CLAUDE.mdを整理」「Skillsに切り出す」等のキーワードで起動。
+description: プロジェクトのエージェント向け指示、Skill、接続設定を監査し、コンテキスト肥大化、重複、配置や呼び出し設定の不一致を根拠付きで指摘する。コンテキスト監査、Skill整理、Skillが見つからない／呼ばれない原因の確認で使う。
 ---
 
 # コンテキスト監査スキル
@@ -24,15 +24,22 @@ description: プロジェクトの CLAUDE.md / AGENTS.md / Skills / Commands / M
 - `.claude/hooks/`
 - `.claude/settings*.json`
 - `.gitignore`
+- 起動ディレクトリからルートまでの`.agents/skills/`
+- `.codex/config.toml`と`.codex/agents/`
+- `.agents/plugins/marketplace.json`と`.claude-plugin/marketplace.json`
+- 対象Pluginの`plugin.json` / `.codex-plugin/plugin.json` / `.claude-plugin/plugin.json`
+
+SkillやPluginの探索、導入状態、呼び出し方針、実行環境を調べる場合は、[配置と呼び出し設定の確認](references/skill-deployment.md)を読む
+参照先、設定、有効な一覧を根拠として示し、実際の呼び出しを観測していなければ未確認とする
 
 ### 2. レイヤーごとに分類する
 
 | レイヤー | 置き場所 | 監査観点 |
 |---|---|---|
 | Project rules | `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` | 恒久ルールだけか。長い手順や例が混ざっていないか |
-| Task procedures | `SKILL.md`, `.claude/skills/*.md` | 再利用手順になっているか。発動条件が明確か |
+| Task procedures | `SKILL.md`, `.claude/skills/*.md` | 再利用手順か。発動条件 / 探索先 / 有効化状態 / 呼び出し方針が一致しているか |
 | External state | MCP, CLI, browser tools | 必要時取得になっているか。出力上限と根拠があるか |
-| Delegated work | `.claude/agents/*.md` | 入力範囲と出力形式が明確か |
+| Delegated work | `.claude/agents/*.md`, `.codex/agents/` | 入力範囲と出力形式が明確か |
 | Deterministic gates | hooks, scripts, CI | LLMに任せるべきでない検査を機械化しているか |
 
 ### 3. 問題を分類する
@@ -47,6 +54,11 @@ description: プロジェクトの CLAUDE.md / AGENTS.md / Skills / Commands / M
 - **Subagent mismatch**: 重い調査をメイン会話で抱えている
 - **Scriptable gate**: secret scan、format、lint、validation などを LLM 判断に任せている
 - **Ignored noise missing**: `node_modules`、`dist`、巨大ログ、生成物の除外が弱い
+
+- **Deployment mismatch** は、正典 / 探索先 / 導入状態 / 有効化状態の不一致
+- **Invocation mismatch** は、自動選択 / 明示呼び出し限定 / 無効化の混同
+- **Metadata duplication** は、有効な探索先でSkillが重複して初期一覧を消費する状態
+- **Unverified package** は、参照先 / 依存関係 / 副作用 / 再配布条件の未確認
 
 ### 4. 改善案を出す
 

@@ -1,0 +1,64 @@
+# Skillの配置と呼び出し設定を確認する
+
+正典、探索先、配布元、導入状態、有効化状態、呼び出し方針を別々に記録する
+`skills/`に正典があることと、ホストの探索先へ配置済みであることは別である
+Pluginのカタログ登録も、インストール済みや利用可能であることを示さない
+
+## 対象を絞って読む
+
+リポジトリ内では、起動ディレクトリからルートまでの`.agents/skills/`と`.claude/skills/`を確認する
+Codexの`.codex/config.toml`、Claude Codeの`.claude/settings*.json`、対象Skillの`agents/openai.yaml`とfrontmatterを照合する
+ユーザー用、管理者用、System同梱、Plugin同梱の状態は、利用可能な一覧と関連する設定から確認する
+外部の設定は対象に関係するキーだけを読み、認証情報を報告へ転記しない
+
+## 呼び出し方針を区別する
+
+| 設定 | 判定する状態 |
+|---|---|
+| Codexの`allow_implicit_invocation: false` | 自動選択を止める。明示呼び出しは可能 |
+| Codexの`[[skills.config]]`に`enabled = false` | 指定したローカルSkillを無効化する |
+| Claude Codeの`disable-model-invocation: true` | モデルからの呼び出しを止める。ユーザーの明示呼び出しは可能 |
+| Claude Codeの`user-invocable: false` | ユーザーからの呼び出しを止める。モデルからは利用可能 |
+| Claude Codeの`skillOverrides`で`off` | 通常のSkillを両方から無効化する。PluginのSkillは別途Pluginの状態を見る |
+
+共通の本文を移植しても、ホスト固有の設定が同じ意味で解釈されるとは限らない
+設定ファイルの静的な判定と、実際の一覧への表示や呼び出しの観測を分ける
+一覧や実行履歴を確認できなければ、稼働状態は未確認とする
+原因の確認に外部操作やスクリプト実行が要る場合は、その操作の権限と依頼範囲を先に確認する
+
+## 初期一覧と配布物を確認する
+
+Codexの初期一覧には名前、説明、パスが入り、本文とは別にコンテキストを使う
+一覧の短縮や省略の警告を確認し、本文の分割だけで一覧が縮むとは判断しない
+同名Skillは統合されないため、正典と配布用コピーを、複数の有効な探索先への重複配置と区別する
+
+参照ファイルとスクリプトの存在、必要な実行環境、依存関係、外部通信と書き込みを確認する
+存在しない参照を、推測したコードで補って実行しない
+Skillや同梱物のライセンス、帰属表示、再配布条件を確認し、不明なら未確認とする
+`license`はfrontmatter、ディレクトリ内のファイル、リポジトリのライセンスなどを照合する
+
+## 接続と実行環境を確認する
+
+Pluginを調べる場合は、共通形式の`mcp.json`、互換形式の`.mcp.json`、登録済み接続を示す`.app.json`、対応するマニフェストの参照先を照合する
+同じサービスがPluginと直接のMCP設定の両方にある場合は、接続先、利用するアカウント、ツール、利用環境を確認してから重複かどうかを判定する
+Skillだけを持つPluginに、外部サービスへの接続が増えたと判断しない
+
+表示上の`Read` / `Write`を実効権限と同一視しない
+接続先の権限、認証スコープ、ホストのツール承認、利用するアカウントを、確認できた根拠の範囲で記録する
+接続可能でも、その依頼で送信や更新を行う承認が済んだとは扱わない
+
+利用する面がWeb、デスクトップ、CLI、IDEのどれかを確認する
+同じCodexホストのMCP設定の共有と、Web側の接続や認証を区別する
+Pluginに含まれるHooksの実行環境と信頼状態は、Pluginのインストールとは別に確認する
+
+定期タスクを対象に含める場合は、設定が提供されていればローカルかクラウドか、入力の所在、利用する接続、開始条件、終了条件を確認する
+ローカルファイルを使うデスクトップのタスクは、マシンとアプリが動いている条件を確認する
+Web側のタスクにローカルフォルダへのアクセスを期待したり、すべての定期タスクにローカル常駐を要求したりしない
+
+## 出典
+
+- [Codex Build skills](https://learn.chatgpt.com/docs/build-skills)
+- [Claude Code Skills](https://code.claude.com/docs/en/skills)
+- [Codex MCP](https://developers.openai.com/codex/mcp)
+- [Plugins](https://learn.chatgpt.com/docs/plugins)
+- [Scheduled tasks](https://learn.chatgpt.com/docs/automations)
