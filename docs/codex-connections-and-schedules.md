@@ -1,6 +1,7 @@
 ---
 title: "Codexの外部接続と定期実行を分けて設計する"
 date: "2026-10-04"
+updated: "2026-10-07"
 tags: [codex, plugins, apps, MCP, automations, permissions]
 ---
 
@@ -92,6 +93,52 @@ CLIとIDEにはスケジュール管理画面がなく、Webかデスクトッ�
 ローカル常駐の条件を、クラウド側のタスクにも一律に当てはめない
 予定を設定する前に通常の対話で同じ入力と手順を試し、実行を開始した後も最初の結果を確認する
 
+実行場所とは別に、会話を継続するか毎回独立させるかを選ぶ
+
+| 形式 | 実行時の文脈 | 向く作業 |
+|---|---|---|
+| スタンドアロン | 保存済みの依頼から毎回新しいチャットを開始する | 独立した定期レポートや点検 |
+| チャット内 | 同じチャットへ戻り、既存の文脈を使う | 進行中の作業の状態確認やレビュー対応 |
+
+毎回必要な入力先と手順は、保存済みの依頼やSkillに残す
+前回の処理位置や処理済み対象を使う場合は、その状態を保存する場所も決める
+チャットを継続することだけで、前回の情報が最新になるとは判断しない
+
+RRULEには頻度と時刻などを記述できる
+次は毎月1日の9時を表す規則の例で、実際に作成したスケジュールではない
+
+```text
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1;BYHOUR=9;BYMINUTE=0
+```
+
+`FREQ=DAILY`だけでは、日次という頻度は示せても実行時刻やタイムゾーンを確定できない
+意図するタイムゾーンを別に指定し、作成時には保存された設定と次回実行日時を確認する
+
+Gitのworktreeは編集中のファイルとの衝突を避けるために使えるが、外部への送信や更新の権限を制限するものではない
+無人実行ではサンドボックスと承認方針を分けて確認する
+ローカルの予定タスクは、組織の設定が許す場合は`approval_policy = "never"`で動き、管理上これを禁止する場合は選択した権限モードの承認方針へ戻る
+承認を求めないことと、サンドボックスの範囲を超えてよいことは別である
+
+人が結果を確認する運用なら、自動処理の成果物を下書きや差分にし、確認が必要な送信や更新に進む前を停止点にする
+失敗時の停止条件、読み取りの再試行上限、途中の成果物を残す場所を依頼へ書く
+送信や更新の成否が不明な場合は、実行履歴を照合してから再試行する
+失敗したことだけを理由に権限を広げたり、利用者の作業中の変更を一括で戻したりしない
+
+GitHub Actionsとの違いも、定期実行とイベント実行だけでは区別できない
+
+| 観点 | 予定タスク | GitHub ActionsでCodexを実行する場合 |
+|---|---|---|
+| 起動 | 時刻、継続確認、対応するAppイベント。利用面によって異なる | schedule、PRやIssueのイベント、手動実行など |
+| 実行場所 | ローカルプロジェクト / worktree / 対応するクラウド | GitHubのrunner |
+| 入力 | 保存した依頼、継続中のチャット、接続済み資料 | checkoutしたコード、イベントの情報、設定した資料 |
+| 権限 | 実行面のサンドボックス、接続権限、承認方針 | GITHUB_TOKEN、Secrets、Actionの権限設定 |
+| 稼働条件 | ローカル実行ならマシンとアプリが必要 | GitHub-hostedなら手元のマシンに依存しない。self-hostedの稼働条件は別に確認 |
+
+`codex-action`はGitHub Actions上でCodexを実行する部品であり、スケジュール自体はworkflowで指定する
+このリポジトリの`daily-triage.yml`は、LLMを使わず文書のリンクや参照を定期検査する例である
+既知の規則で判定できる処理は通常の検査で、文脈を読んで判断する処理はSkillを使うタスクで扱える
+Skillからサブエージェントへ委譲するために、予定タスクを先に設定する必要はない
+
 ## このリポジトリでの確認
 
 `context-audit`でSkillの導入、Pluginの接続設定、利用する実行面を照合できる
@@ -105,3 +152,6 @@ CLIとIDEにはスケジュール管理画面がなく、Webかデスクトッ�
 - [接続と権限の関係](https://learn.chatgpt.com/docs/enterprise/apps-and-connectors#understand-the-capability-chain)
 - [Scheduled tasks](https://learn.chatgpt.com/docs/automations)
 - [Package your plugin](https://developers.openai.com/plugins/build/plugins)
+
+- [GitHub Actionsの起動条件](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
+- [Codex GitHub Action](https://github.com/openai/codex-action)
