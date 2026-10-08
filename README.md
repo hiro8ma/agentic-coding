@@ -33,6 +33,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `coding-agent-github-actions.md` — CI でのコーディングエージェント運用
   - `pr-review-bot-workflow.md` — PR レビュー bot
   - `security.md` — セキュリティガイドライン
+  - `understanding-bottleneck.md` — エージェントが書く変更を人が理解するための解説の条件、クイズの役目と選択式の漏れ、安全
 - **skills/** — 可搬な Agent Skills（`SKILL.md` + scripts / references / assets）
   - `knowledge-note/` — ナレッジノートを書く
   - `weekly-report/` — 週次の進捗報告を作る
@@ -44,6 +45,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `brand-template/` — ブランド（配色・書体・トンマナ）を成果物に自動適用するガードレール型スキルのテンプレート
   - `slack-post/` — Slack 投稿文の作成・整形規範（プラットフォーム制約内蔵型）
   - `cognitive-rhythm-writing/` — 長文解説に読み進める推進力を持たせる認知リズム設計（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) の要旨を再構成。japanese-tech-writing と併用）
+  - `explain-diff/` — コードの変更を背景 → 直感 → コードの順の解説文書にし、チャットの自由記述クイズで理解を確かめる（出典 [Geoffrey Litt の gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524) を日本語とチャットのクイズに合わせて再構成）
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill
