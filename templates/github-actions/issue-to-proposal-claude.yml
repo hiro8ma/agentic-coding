@@ -1,0 +1,89 @@
+# .github/workflows/ に置く。入力は anthropics/claude-code-action の README と docs（2026-10時点）に合わせた
+name: issue-to-proposal-claude
+
+on:
+  issues:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  propose:
+    if: >-
+      github.event.label.name == 'agent-proposal' &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Issue の本文は信頼しない入力なので、${{ }} を run に直接埋め込まず env 経由で渡す
+      - name: Save the Issue as data
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          mkdir -p issue-context docs/proposals
+          printf '%s\n' "$ISSUE_TITLE" > issue-context/title.txt
+          printf '%s\n' "$ISSUE_BODY" > issue-context/body.md
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+
+      # Goal / Context Pointers / Constraints / Done When が欠けた Issue や、範囲を広げる指示の語を含む Issue はここで止める
+      - name: Lint the Issue
+        run: go run github.com/hiro8ma/agent/go/cmd/issuelint@latest -file issue-context/body.md
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          label_trigger: agent-proposal
+          prompt: |
+            .github/agent-prompts/issue-to-proposal.md を読み、その指示に従う。
+            提案書は docs/proposals/issue-${{ github.event.issue.number }}.md に書く。
+            最終応答は、書いたファイルのパスだけにする。
+          # --model は組織が許可しているモデルに置き換える
+          claude_args: |
+            --model claude-sonnet-5-5
+            --max-turns 30
+            --allowedTools "Read,Grep,Glob,Bash(git log:*),Bash(git diff:*),Edit(docs/proposals/**)"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: proposal
+          path: docs/proposals/issue-${{ github.event.issue.number }}.md
+          if-no-files-found: error
+
+  open-pr:
+    needs: propose
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: proposal
+          path: docs/proposals
+
+      - uses: peter-evans/create-pull-request@v8
+        with:
+          branch: agent/proposal-issue-${{ github.event.issue.number }}
+          draft: true
+          title: "docs(proposals): Issue #${{ github.event.issue.number }} の調査と提案書"
+          commit-message: "docs(proposals): Issue #${{ github.event.issue.number }} の調査と提案書"
+          add-paths: docs/proposals/issue-${{ github.event.issue.number }}.md
+          body: |
+            Issue #${{ github.event.issue.number }} に agent-proposal ラベルが付いたので、Claude Code がコードを調べて提案書を書いた。
+            この PR はコードを変えない。
+            変更は docs/proposals/issue-${{ github.event.issue.number }}.md の1ファイルだけ。
+            実装に進むかどうかは、提案書を読んで人が決める。

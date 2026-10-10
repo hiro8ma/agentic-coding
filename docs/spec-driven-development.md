@@ -210,8 +210,18 @@ GitHub Spec Kit は、仕様を主成果物として扱い、次の流れを提�
 | specify | `.steering/<date>-<title>/requirements.md` |
 | plan | `.steering/<date>-<title>/design.md` |
 | tasks | `.steering/<date>-<title>/tasklist.md` |
+| clarify | `requirements.md` の曖昧な箇所を質問で埋め、design の前に仕様へ戻す |
 | implement | `tasklist.md` に沿った実装 |
-| analyze / checklist | 実装前の仕様整合性チェック |
+| analyze | implement の前に spec / plan / tasks の食い違いと抜けを報告する読み取り専用の検査 |
+| checklist | 実装前の仕様整合性チェック |
+| converge | implement の後に仕様と実装の収束を確かめ、収束したと報告されるまで implement と繰り返す |
+
+### Codex で使う
+
+`specify init <dir> --integration codex` で初期化すると（以前の `--ai` は v0.10.0でなくなった）、Spec Kit は `.agents/skills/` に skill を入れ、Codex では `$speckit-specify` の形で呼ぶ。
+specify では技術スタックを決めず、何を作るかと理由だけを書く。
+技術スタックとアーキテクチャは plan で渡す。
+詳細は `docs/issue-to-proposal-workflow.md` を参照。
 
 ## Vibe Coding との関係
 
