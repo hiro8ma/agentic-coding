@@ -35,6 +35,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `pr-review-bot-workflow.md` — PR レビュー bot
   - `security.md` — セキュリティガイドライン
   - `understanding-bottleneck.md` — エージェントが書く変更を人が理解するための解説の条件、クイズの役目と選択式の漏れ、安全
+  - `issue-to-proposal-workflow.md` — Issue にラベルを貼ると、エージェントがコードを調べて提案書だけを PR にするワークフローと安全策
 - **skills/** — 可搬な Agent Skills（`SKILL.md` + scripts / references / assets）
   - `knowledge-note/` — ナレッジノートを書く
   - `weekly-report/` — 週次の進捗報告を作る
@@ -47,6 +48,8 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `slack-post/` — Slack 投稿文の作成・整形規範（プラットフォーム制約内蔵型）
   - `cognitive-rhythm-writing/` — 長文解説に読み進める推進力を持たせる認知リズム設計（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) の要旨を再構成。japanese-tech-writing と併用）
   - `explain-diff/` — コードの変更を背景 → 直感 → コードの順の解説文書にし、チャットの自由記述クイズで理解を確かめる（出典 [Geoffrey Litt の gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524) を日本語とチャットのクイズに合わせて再構成）
+- **templates/** — リポジトリにコピーして使う雛形
+  - `github-actions/` `github-issue/` — Issue から提案書の PR を作るワークフロー（Codex 版 / Claude Code 版）、プロンプト、Issue の雛形
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
   - `skills/` — Claude Code の Skill

@@ -48,7 +48,7 @@ Warp の software factory の手引きは、`ready-to-spec` で仕様を書か�
 ### 読み取り専用で動かす
 
 Codex 版は `permission-profile` に `":read-only"` を渡す。
-Codex はファイルを読めるが、書き換えもネットワークへの接続もできない。
+Codex はファイルを読めるが、書き換えはできない。
 提案書は Codex の最終応答で、`output-file` に指定したパスへ Action が書き出す。
 権限プロファイルはベータの機能で、Codex CLI 0.138.0以降が要る。
 `sandbox` と同時に指定すると Codex の起動前にエラーになり、`safety-strategy: read-only` とも併用できない。
