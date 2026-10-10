@@ -1,0 +1,194 @@
+name: Codex proposal example
+
+on:
+  issues:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  generate:
+    if: github.event.label.name == 'codex-ready' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      proposal: ${{ steps.proposal.outputs.final-message }}
+    steps:
+      - name: Verify the labeling actor
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const actors = new Set([context.actor, process.env.TRIGGERING_ACTOR]);
+            for (const username of actors) {
+              const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username,
+              });
+              if (!['admin', 'maintain', 'write'].includes(data.permission)) {
+                throw new Error('The labeling or rerunning actor lacks repository write access');
+              }
+            }
+
+      - name: Check out trusted workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Save Issue context as data
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          data = {key.lower(): os.environ[key] for key in (
+              "ISSUE_NUMBER", "ISSUE_URL", "ISSUE_TITLE", "ISSUE_BODY"
+          )}
+          Path("issue-input.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+          PY
+
+      - name: Generate one proposal
+        id: proposal
+        uses: openai/codex-action@bdf19a4a223ec2549a3e2274a0cf61556bc07675 # v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-version: '0.162.0'
+          prompt-file: examples/codex-ci/prompts/proposal.md
+          permission-profile: ':read-only'
+          safety-strategy: drop-sudo
+
+  package:
+    needs: generate
+    if: needs.generate.outputs.proposal != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Save the document without evaluating it
+        env:
+          PROPOSAL_TEXT: ${{ needs.generate.outputs.proposal }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          text = os.environ["PROPOSAL_TEXT"]
+          if not text.strip() or len(text) > 12000:
+              raise SystemExit("Proposal is empty or exceeds the example size limit")
+          Path("proposal.md").write_text(text, encoding="utf-8")
+          PY
+
+      - name: Upload only the proposal
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: proposal-${{ github.run_id }}
+          path: proposal.md
+          if-no-files-found: error
+          retention-days: 1
+
+  create-pr:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out trusted base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Download proposal into a separate directory
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: proposal-${{ github.run_id }}
+          path: ${{ runner.temp }}/proposal-input
+
+      - name: Copy one document as data
+        env:
+          PROPOSAL_DIRECTORY: ${{ runner.temp }}/proposal-input
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
+          PR_ASSIGNEE: ${{ vars.CODEX_PR_ASSIGNEE }}
+          REVIEW_DEADLINE: ${{ vars.CODEX_REVIEW_DEADLINE }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          directory = Path(os.environ["PROPOSAL_DIRECTORY"])
+          source = directory / "proposal.md"
+          if sorted(p.name for p in directory.iterdir()) != ["proposal.md"] or source.is_symlink():
+              raise SystemExit("Expected exactly one regular proposal.md")
+          if not os.environ["PR_ASSIGNEE"] or not os.environ["REVIEW_DEADLINE"]:
+              raise SystemExit("Set the assignee and concrete review deadline before introduction")
+          text = source.read_text(encoding="utf-8")
+          if not text.strip() or len(text) > 12000:
+              raise SystemExit("Invalid proposal size")
+          issue_number = int(os.environ["ISSUE_NUMBER"])
+          run_id = int(os.environ["RUN_ID"])
+          target = Path(f"docs/proposals/issue-{issue_number}-{run_id}.md")
+          if target.exists() or target.is_symlink() or any(p.is_symlink() for p in target.parents):
+              raise SystemExit("Refusing to overwrite existing content or follow a symlink")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Create the document PR within approved scope
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          token: ${{ github.token }}
+          branch: proposal/issue-${{ github.event.issue.number }}-${{ github.run_id }}
+          add-paths: docs/proposals/issue-${{ github.event.issue.number }}-${{ github.run_id }}.md
+          commit-message: 'docs(proposal): Issueの提案書を追加'
+          title: 'docs(proposal): Issueの提案書を追加'
+          draft: true
+          assignees: ${{ vars.CODEX_PR_ASSIGNEE }}
+          body: |
+            ## TL;DR
+
+            Issueで依頼された作業を提案書としてレビューできる状態にする
+
+            - 成果と参照先を文書にまとめる
+            - 制約と完了条件を記す
+            - 実装前の未確認事項を残す
+
+            ## 全体像
+
+            ```mermaid
+            flowchart LR
+              Issue --> Proposal["提案書を追加する今回のPR"] --> Decision["人が実装の可否を判断"]
+              style Proposal fill:#dbeafe,stroke:#2563eb,stroke-width:3px
+            ```
+
+            ## Overview
+
+            生成した提案書1ファイルを追加する
+            内容は未検証の提案で、実装と動作確認は別の作業として扱う
+
+            ## Reference
+
+            [作業の依頼元Issue](${{ github.event.issue.html_url }})
+
+            ## Debug List
+
+            - [ ] 提案書の成果 / 制約 / 完了条件が依頼と一致することを確認する
+            - [ ] 参照先が実在し、提案の根拠を支持することを確認する
+
+            ## Review Deadline
+
+            ${{ vars.CODEX_REVIEW_DEADLINE }}

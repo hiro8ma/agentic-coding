@@ -1,0 +1,6 @@
+{
+  "name": "review-pr",
+  "version": "0.1.0",
+  "description": "変更の根拠を確認して、修正が必要な不具合を報告する",
+  "skills": "./skills/"
+}

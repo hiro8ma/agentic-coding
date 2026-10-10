@@ -57,6 +57,39 @@ OpenAI固有の表示、登録済み接続への対応付け、Hooksの設定は
 共通形式でMCPサーバーを同梱する場合は、ルートの`mcp.json`にスキーマと各サーバーのtransportの`type`を記述する
 `.mcp.json`を名前だけ変えて共通形式に移行したことにはならない
 
+## 教材の互換形式でレビューPluginを作る
+
+教材のreview-prは、互換形式のマニフェストを使う例である
+ディレクトリごと別のGitリポジトリへ移せる[サンプル](../examples/codex-ci/review-pr-plugin/)を用意した
+READMEは導入と利用、marketplace.jsonは発見と配布、plugin.jsonは構成、SKILL.mdはレビューの判断基準を担当する
+
+```text
+review-pr-plugin/
+├── README.md
+├── .agents/plugins/marketplace.json
+└── plugins/review-pr/
+    ├── .codex-plugin/plugin.json
+    └── skills/review/SKILL.md
+```
+
+```json
+{
+  "name": "review-pr",
+  "version": "0.1.0",
+  "description": "変更の根拠を確認して、修正が必要な不具合を報告する",
+  "skills": "./skills/"
+}
+```
+
+このskillsフィールドは互換形式の指定で、ルートのportable形式へそのまま写さない
+Plugin名とSkill名は別で、review-prとreviewの組み合わせはreview-pr:reviewとなる
+この例はSkillだけを含み、Apps、MCPサーバー、Hooksは追加しない
+
+公式資料はPlugin Creatorによる作成も案内しているが、利用できるかはその環境の一覧で確認する
+今回のセッションにはplugin-creatorがなかったため、サンプルは手作業で作成した
+validate_plugin.pyも、実在するスクリプトを確認してから利用する
+JSONと参照先の検査、ホストでの発見、Skillの発動、レビュー結果の品質は別々に確認する
+
 ## カタログへ登録する
 
 `.agents/plugins/marketplace.json`は、リポジトリで利用できるPluginの一覧である
@@ -114,6 +147,18 @@ enabled = true
 インストール後は新しいセッションで一覧と最小の作業を確認する
 Hooksを追加した場合は、実行環境のスクリプト配置とHook定義の信頼確認も必要になる
 
+## GitHubでの共有と公式Directoryへの公開
+
+GitHubのMarketplaceを登録して使う配布と、ChatGPTとCodex共通の公開Directoryへの提出は別の手続きである
+現在の公開手順は、提出用ZIPのアップロード、自動検査、レビュー提出、承認後の公開として案内されている
+教材の「公開管理機能は今後予定」を、現在も使える説明としては残さない
+今回、公開ポータルへのログインや提出は行っていない
+
+GitHubから配る場合は、受け手が確認した版を登録して導入する
+--ref mainはブランチの選択であり、同じコミットへ固定したことにはならない
+再現可能な配布には確認済みのタグやコミットを指定し、更新と導入後のキャッシュを確認する
+チームの判断基準をCIへ渡す方法は[Codex ActionとSkill](codex-skills-in-ci.md)を参照する
+
 ## コード以外の作業にも使う
 
 仕様書や表を確認する場合も、何を入力として何を返すかを依頼に書く
@@ -147,6 +192,7 @@ Pluginの発見と、各Skillの実行互換性は分けて確認する
 ## 出典
 
 - [Package your plugin](https://developers.openai.com/plugins/build/plugins)
+- [Submit plugins](https://developers.openai.com/plugins/deploy/submission)
 - [Plugins](https://learn.chatgpt.com/docs/plugins)
 - [Configuration Reference](https://learn.chatgpt.com/docs/config-file/config-reference)
 - [Build skills](https://learn.chatgpt.com/docs/build-skills)

@@ -28,6 +28,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `codex-plugins.md` — CodexのPlugin形式、カタログ、導入設定と既存Pluginの共有
+  - `codex-skills-in-ci.md` — 共有SkillをCIへ渡す方法、Codex Actionの権限、生成と投稿の分離
   - `codex-connections-and-schedules.md` — AppsとMCPの権限、実行面、ローカルとクラウドの定期タスク
   - `design-skills.md` — frontend-design / theme-factory / canvas-design と転用できる設計哲学
   - `subagents.md` — サブエージェントのパターン

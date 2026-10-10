@@ -1,0 +1,15 @@
+{
+  "name": "review-examples",
+  "interface": {
+    "displayName": "Review examples"
+  },
+  "plugins": [
+    {
+      "name": "review-pr",
+      "source": {
+        "source": "local",
+        "path": "./plugins/review-pr"
+      }
+    }
+  ]
+}
