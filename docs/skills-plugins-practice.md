@@ -11,6 +11,20 @@ tags: [codex, skills, plugins, evaluation]
 次の手順と依頼例は、ユーザー提供教材「Skills / Pluginsの実践活用」を公式資料と照合して整理したものである
 教材にある`chatgpt-content-reference`のコードや画像は取得できず、例を復元したものではない
 
+## 導入するものに応じて入口を選ぶ
+
+| 導入物 | 内容 | 導入の入口 |
+|---|---|---|
+| 単独Skill | 作業手順と判断基準、任意の補助ファイル | skill-installer、探索先への配置 |
+| CLIプログラム | 実際に処理を行う実行コード | npm、Homebrew、go install、pipxなど |
+| Plugin | Skillと接続などをまとめたパッケージ | Pluginの一覧、codex plugin addなど |
+| 外部サービスの接続 | アカウントと権限 | サービスの認証と接続設定 |
+
+Skill利用頻度を調べるdeadskillsやgocccはCLIプログラムで、名前をskill-installerに渡して導入するものではない
+Codex Usage TrackerはPythonの実行プログラムとCodex Pluginをそれぞれ導入する
+使い方のSkillが別途配布されていれば、そのSkill部分をskill-installerで取得できる
+実行プログラムや依存関係の導入まで済んだとは扱わない
+
 ## 既存Skillを導入する
 
 Codexの単独Skillは、`$skill-installer`へ名前またはGitHub上の対象ディレクトリを指定して導入できる
@@ -19,6 +33,9 @@ Codexの単独Skillは、`$skill-installer`へ名前またはGitHub上の対象�
 ```text
 $skill-installer linear
 ```
+
+この例はLinearの作業手順を持つ単独Skillの導入である
+Linear Pluginの導入や、Linearへの外部接続の完了を意味しない
 
 導入前には、`SKILL.md`の対象範囲と操作、参照ファイル、スクリプトの通信先、認証情報の扱い、書き込み先を確認する
 提供元、更新状況、ライセンスも確認する
@@ -43,7 +60,18 @@ ChatGPTでは`@`、Codex CLIやIDEの単独Skillでは`$`または`/skills`が�
 
 このリポジトリのMarketplace追加とPlugin導入は[CodexのPlugin](codex-plugins.md)を参照する
 手元のCodex CLI 0.162.0のヘルプでは、導入コマンドは`codex plugin add <PLUGIN@MARKETPLACE>`である
-この確認ではヘルプのみを読み、Pluginの導入や接続は行っていない
+2026年10月11日に、同じCLIでLinear Plugin 5.0.1を導入した
+
+```shell
+codex plugin add linear@openai-curated-remote --json
+codex plugin list --json
+```
+
+導入前は未インストールで、導入後の一覧ではinstalledとenabledが両方trueになった
+アカウント側の管理情報でもインストール済みを確認した
+この状態確認と、外部のIssueを取得できることは別であり、実データへのアクセスは未確認である
+インストールを案内する表示だけで完了とは扱わず、導入後の状態を再取得する
+新しいセッションでツールを確認し、接続が必要と表示された場合にサービスへの認証を行う
 
 ## 呼び出しと成果を別に検証する
 
@@ -66,6 +94,14 @@ ChatGPTでは`@`、Codex CLIやIDEの単独Skillでは`$`または`/skills`が�
 PRレビューでは、重要度、対象箇所、発生条件、影響、根拠、修正方針を確認する
 テスト不足だけを理由にバグと断定せず、軽微なスタイルの好みで指摘を増やさない
 外部にレビューコメントを投稿する操作は、ローカルのレビュー検証と分ける
+
+## 利用履歴を集計するときの注意
+
+ログでSkill本文を読んだ回数と、実際に作業へ適用した回数を区別する
+監査目的の読み取りもあり、本文の直接注入や再読なしの利用は、ファイル読み取りの集計から漏れる
+現在のCodexログにはcustom_tool_callもあるため、function_callだけを読む解析器では不足する
+履歴に記録がないことだけを理由に、未使用と判断して削除しない
+今後の継続集計には、CodexのSkill利用イベントを収集する方法も検討できる
 
 ## 作成と共有
 
@@ -91,5 +127,9 @@ Plugin化しても、参照先や認証、各環境での動作の確認は必�
 - [Build skills](https://learn.chatgpt.com/docs/build-skills)
 - [Plugins](https://learn.chatgpt.com/docs/plugins)
 - [Package your plugin](https://developers.openai.com/plugins/build/plugins)
+- [deadskillsのCodex解析](https://github.com/anandsaini18/deadskills/blob/main/src/adapters/codex.ts)
+- [gocccのTool & Skill Analytics](https://github.com/backstabslash/goccc#tool--skill-analytics)
+- [Codex Usage Tracker](https://github.com/douglasmonsky/codex-usage-tracker)
+- [Codex 0.162.0のSkill利用イベント](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/otel/src/skill_invocation.rs)
 
 公式資料の確認日は2026年10月11日
