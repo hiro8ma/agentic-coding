@@ -26,9 +26,12 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `codex-execution-steering.md` — 実行中の追加指示、中断、委任できる検証環境の整え方
   - `codex-plan-mode.md` — Plan modeで調査、意図合わせ、実装方針のレビューを進める判断基準
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
+  - `spec-kit-practice.md` — Spec Kitで要求を具体化し、計画と検証を対応付ける方法
+  - `ai-dlc-codex.md` — AI-DLCの旧ルール配置と現行Codex対応、仕様の正本の維持
   - `plugins-and-extension-points.md` — Skills / Subagents / Hooks / MCP の役割分担とプラグイン
   - `codex-plugins.md` — CodexのPlugin形式、カタログ、導入設定と既存Pluginの共有
   - `codex-skills-in-ci.md` — 共有SkillをCIへ渡す方法、Codex Actionの権限、生成と投稿の分離
+  - `codex-review-security.md` — ローカルとGitHubのレビュー、Securityの提供形態と権限
   - `codex-connections-and-schedules.md` — AppsとMCPの権限、実行面、ローカルとクラウドの定期タスク
   - `design-skills.md` — frontend-design / theme-factory / canvas-design と転用できる設計哲学
   - `subagents.md` — サブエージェントのパターン
