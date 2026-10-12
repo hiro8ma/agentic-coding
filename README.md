@@ -43,6 +43,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
 - **skills/** — 可搬な Agent Skills（`SKILL.md` + scripts / references / assets）
   - `knowledge-note/` — ナレッジノートを書く
   - `weekly-report/` — 週次の進捗報告を作る
+  - `one-on-one-status/` — 1on1 シートに貼る、その週にやったことのまとめを作る
   - `analysis-report/` — データ分析の結果を、意思決定に使えるレポートにまとめる
   - `japanese-tech-writing/` — 日本語技術文書のライティング規範（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d)、Unlicense）
   - `context-audit/` — CLAUDE.md / AGENTS.md / Skills / MCP / Hooks / Subagents のコンテキスト監査
