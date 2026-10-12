@@ -11,6 +11,7 @@ import sys
 
 # 表記ゆれを許容するため、各セクションを正規表現の選択肢で定義する。
 REQUIRED_SECTIONS = {
+    "サマリー": r"サマリー|要約|概要|summary",
     "実績": r"実績|成果|やったこと|done|achievements?",
     "課題": r"課題|問題|ブロッカー|懸念|issues?|blockers?",
     "次週予定": r"次週|来週|予定|計画|next ?week|plan",
@@ -46,9 +47,9 @@ def main(argv: list[str]) -> int:
     missing = validate(text)
     if missing:
         print("不足セクション: " + ", ".join(missing))
-        print("週報には実績・課題・次週予定の見出しが必要です。")
+        print("週報にはサマリー・実績・課題・次週予定の見出しが必要です。")
         return 1
-    print("OK: 必須セクション（実績・課題・次週予定）を確認しました。")
+    print("OK: 必須セクション（サマリー・実績・課題・次週予定）を確認しました。")
     return 0
 
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "business-tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "見積書の PDF 作成と週次報告の作成。定型書類を対話とテンプレートで組み立てるスキル群。",
   "author": {
     "name": "hiro8ma",
