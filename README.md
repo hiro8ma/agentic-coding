@@ -58,7 +58,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `cognitive-rhythm-writing/` — 長文解説に読み進める推進力を持たせる認知リズム設計（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) の要旨を再構成。japanese-tech-writing と併用）
   - `explain-diff/` — コードの変更を背景 → 直感 → コードの順の解説文書にし、チャットの自由記述クイズで理解を確かめる（出典 [Geoffrey Litt の gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524) を日本語とチャットのクイズに合わせて再構成）
 - **templates/** — リポジトリにコピーして使う雛形
-  - [codex-team/](templates/codex-team/) — 作業分担と、判定を試してから配るコマンド制御の例
+  - [codex-team/](templates/codex-team/) — 共有設定、作業分担、コマンド制御の雛形
   - [task-design/feature-handoff.md](templates/task-design/feature-handoff.md) — 既存実装の調査結果を4要素の機能追加依頼へ引き継ぐ
   - [mobile-rebuild/acceptance-contract.md](templates/mobile-rebuild/acceptance-contract.md) — 1機能の再構築で残す動作、比較方法、受け入れの証拠
   - [mobile-rebuild/platform-port.md](templates/mobile-rebuild/platform-port.md) — 移植元の仕様抽出、参考実装、共通ロジックとOS固有UIの比較
