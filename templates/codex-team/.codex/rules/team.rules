@@ -1,0 +1,49 @@
+# 個人やプロジェクトの規則と合わせて評価され、最も厳しい判定が使われる。ここに allow は置かない
+
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "prompt",
+    justification = "マージは人が決める。CIとレビューの状態を人が確かめてから承認する",
+    match = ["gh pr merge 12 --squash"],
+    not_match = ["gh pr view 12"],
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "リモートへの反映は人が承認する。フラグを末尾に置いた強制pushもここで止まる",
+    match = ["git push origin feature/x", "git push origin feature/x --force"],
+    not_match = ["git pull"],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["--force", "-f"]],
+    decision = "forbidden",
+    justification = "他人のコミットを消しうるため、エージェントからの強制pushは禁止。上書きが要るときは--force-with-leaseを人が承認して使う",
+    match = ["git push --force origin feature/x", "git push -f"],
+    not_match = ["git push --force-with-lease origin feature/x"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-Rf", "-fR"]],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は取り消せないため禁止。消したい対象を挙げて人に依頼する",
+    match = ["rm -rf build", "rm -fr build"],
+    not_match = ["rm build/output.log"],
+)
+
+prefix_rule(
+    pattern = ["terraform", ["apply", "destroy"]],
+    decision = "prompt",
+    justification = "実環境のリソースを変えるため、planの結果を人が確かめてから承認する",
+    match = ["terraform apply", "terraform destroy -target=module.cache"],
+    not_match = ["terraform plan"],
+)
+
+prefix_rule(
+    pattern = ["kubectl", "delete"],
+    decision = "prompt",
+    justification = "クラスタのリソースを消すため、接続先のコンテキストと名前空間を人が確かめてから承認する",
+    match = ["kubectl delete pod web-0"],
+    not_match = ["kubectl get pods"],
+)

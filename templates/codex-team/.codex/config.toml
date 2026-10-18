@@ -1,0 +1,3 @@
+# 信頼済みのプロジェクトでだけ読まれ、CLIのフラグで上書きできる。強制するならrequirements.tomlを使う
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
