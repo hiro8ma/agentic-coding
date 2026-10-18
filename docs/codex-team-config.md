@@ -38,7 +38,8 @@ AGENTS.mdに「マージしない」と書くだけでは、モデルが指示�
 
 逆に、ログに個人情報を出さないといった判断はコマンドの形では書けない
 こうした基準はAGENTS.mdに置き、レビューでも確かめる
-雛形のAGENTS.mdでは、`Review guidelines`の節にレビューで確かめる観点を書いた
+雛形のAGENTS.mdでは、`Code Review Rules`の節にレビューで確かめる観点を書いた
+GitHubのCodexレビューは、この見出しの節をレビューの観点として読む（2026-10-18に公式の文書で確認した見出し。以前の文書にあった`Review guidelines`が今も効くかは未確認）
 GitHubのCodexレビューでAGENTS.mdをどう使うかは[codex-review-security.md](codex-review-security.md)にある
 
 ## 規則の判定と層の重なり
