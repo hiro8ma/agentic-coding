@@ -1,0 +1,26 @@
+# 学習用のprefix例であり、引数順が違う操作や別の削除手段まで制御するものではない
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "prompt",
+    justification = "マージするPRと実行時機を人が確認する",
+    match = [
+        "gh pr merge 42",
+        "gh pr merge 42 --squash",
+    ],
+    not_match = [
+        "gh pr --repo example/project merge 42",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除をこのprefixでは許可しないため、対象と削除方法を人に相談する",
+    match = [
+        "rm -rf example-output",
+    ],
+    not_match = [
+        "rm -fr example-output",
+        "rm -r -f example-output",
+    ],
+)
