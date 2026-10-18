@@ -26,6 +26,30 @@ tags: [codex, mobile, modernization, verification, worktree]
 これは責任の分担であり、GUIや申請操作が技術的に自動化できないという分類ではない
 実装コードを人が読む必要性も、変更の影響と検証で確かめられる範囲から決める
 
+## 人間の設計関与を決める
+
+設計へどこまで人間が関わるかは、可逆性と、人によって判断が分かれる度合いから考える
+
+| 判断軸 | 確認すること |
+|---|---|
+| 可逆性 | 元へ戻す手順、復旧の負担、コードを戻しても残る影響 |
+| 判断が分かれる度合い | 選択肢、採用基準、誰が決める必要があるか |
+
+戻しにくく判断が分かれる変更では、人間が設計段階から外せない論点を渡し、エージェントの案を比較して採否を決める
+前提違いやテスト観点の不足があれば、その理由を伝えて案を直す
+戻しやすく、既存の規約から判断できる変更なら、設計からテストまで任せる範囲を広げられる
+
+たとえば既存規約に沿う余白の調整と、認証や保存形式の変更では、人間が決める内容が異なる
+UIという作業名でも、データ削除や権限に関わるなら、その影響と戻し方から判断する
+判断材料が不足していることを、簡単な変更である根拠にはしない
+
+提供教材には簡易テーマでコードレビューを省く運用例があるが、これは事例固有の選択である
+2軸はレビューを一律に省略する基準にはせず、既存のレビュー規則と検証で確認できる範囲を合わせて決める
+OpenAIの公式案内も、テスト、要求した挙動の確認、差分レビューを扱っている
+
+採用理由、受け入れるリスク、後から変更できる根拠を受け入れ票へ残す
+人間がすべての実装を書くことと、これらの判断を説明できることは別に扱う
+
 ## 検証コマンドを用意する
 
 実プロジェクトの設定を調べてから、繰り返すコマンドをスクリプトへまとめる
@@ -89,8 +113,10 @@ Crashlyticsのusersはアプリのinstallationを指すため、人数と無条�
 
 ## 参照資料
 
+- ユーザー提供教材「Codexを使ったモバイルアプリ再構築」。元発表の著者とURLは未確認
 - [Codexのローカル環境](https://learn.chatgpt.com/docs/environments/local-environment)
 - [Codexのworktree](https://learn.chatgpt.com/docs/environments/git-worktrees)
+- [Codexのテストとレビュー](https://learn.chatgpt.com/guides/best-practices#improve-reliability-with-testing-and-review)
 - [Appleのコマンドラインテスト](https://developer.apple.com/library/archive/technotes/tn2339/_index.html)
 - [AppleのDerivedData出力先の例](https://developer.apple.com/documentation/xcode/distributing-documentation-to-other-developers)
 - [Androidのコマンドラインテスト](https://developer.android.com/studio/test/command-line)
