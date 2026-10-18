@@ -52,10 +52,11 @@ Codex はファイルを読めるが、書き換えはできない。
 提案書は Codex の最終応答で、`output-file` に指定したパスへ Action が書き出す。
 権限プロファイルはベータの機能で、Codex CLI 0.138.0以降が要る。
 `sandbox` と同時に指定すると Codex の起動前にエラーになり、`safety-strategy: read-only` とも併用できない。
-雛形は `safety-strategy` を既定の `drop-sudo` のままにしている。
+雛形は `safety-strategy` に既定値の `drop-sudo` を明示し、Codex のプロセスから sudo を外す。
 
 Claude Code 版は `--allowedTools` で使える道具を絞る。
 読む道具（Read / Grep / Glob）と `git log` / `git diff` のほかに許すのは、`Edit(docs/proposals/**)` だけにした。
+WebFetch と WebSearch は `--disallowedTools` で道具の一覧からも外す。
 パスの規則が評価されるのは `Edit(path)` と `Read(path)` で、`Write(path)` は書けても評価されない。
 `Write(docs/proposals/*)` のような書き方では書き込み先を絞れないので、雛形は `Edit` の規則で書く。
 Claude Code Action は GitHub を操作する基本の道具を常に含める。
@@ -66,6 +67,7 @@ Claude Code Action は GitHub を操作する基本の道具を常に含める�
 エージェントが指示を取り違えても、このジョブからは push も PR の作成もできない。
 Claude Code Action は既定で、自分で PR を作らずにブランチを push してリンクを返す。
 push の権限を渡さないので、この動きも起きない。
+起動できる人とログへの出力を両方の Action の入力で絞る設定は、[claude-codex-skill-parity.md](claude-codex-skill-parity.md) にまとめた。
 
 ### 出力を1ファイルに絞る
 

@@ -20,6 +20,7 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `agent-skills.md` — Agent Skills の仕様、段階的開示、各社の採用実態
   - `skill-reuse-and-portability.md` — Systemと公開Skillの分類、導入前の確認、CodexとClaude Codeへの移植
   - `skills-plugins-practice.md` — SkillとPluginの導入、呼び出し、外部認証、成果の検証
+  - [claude-codex-skill-parity.md](docs/claude-codex-skill-parity.md) — Claude CodeとCodexで共有するSkillの呼び出し方針と置き場所の照合、検査スクリプト、提案書ワークフローの起動者とログの制限
   - `context-design.md` — Vibe Coding のためのコンテキスト設計、CLAUDE.md / Skills / MCP / Subagents の責務分離
   - `codex-project-configuration.md` — Codexのプロジェクト設定、信頼設定、AGENTS.mdの探索順序とサイズ上限
   - `codex-team-config.md` — チームで共有するCodexのRulesと設定の雛形、層の重なりと信頼の条件、Claude Codeとの対応

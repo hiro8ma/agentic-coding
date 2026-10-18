@@ -46,6 +46,11 @@ jobs:
           # model を省くと Codex の既定のモデルを使う。固定するなら組織で許可されたものを書く
           effort: low
           permission-profile: ":read-only"
+          # 既定値でも明示する。ここで許した人と bot は、書き込み権限の確認を飛ばして起動できる
+          allow-users: ""
+          allow-bots: "false"
+          # sudo が残ると、読み取り専用のプロファイルでもメモリ上の API キーを読める
+          safety-strategy: drop-sudo
           prompt-file: .github/agent-prompts/issue-to-proposal.md
           output-file: docs/proposals/issue-${{ github.event.issue.number }}.md
 

@@ -45,6 +45,12 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ github.token }}
           label_trigger: agent-proposal
+          # 既定値でも明示する。ここで許した bot と人は、書き込み権限の確認を飛ばして起動できる
+          allowed_bots: ""
+          allowed_non_write_users: ""
+          # true にすると、ツールの結果が公開のログに、エージェントの文章がジョブの概要に出る
+          show_full_output: "false"
+          display_report: "false"
           prompt: |
             .github/agent-prompts/issue-to-proposal.md を読み、その指示に従う。
             提案書は docs/proposals/issue-${{ github.event.issue.number }}.md に書く。
@@ -54,6 +60,7 @@ jobs:
             --model claude-sonnet-5-5
             --max-turns 30
             --allowedTools "Read,Grep,Glob,Bash(git log:*),Bash(git diff:*),Edit(docs/proposals/**)"
+            --disallowedTools "WebFetch,WebSearch"
 
       - uses: actions/upload-artifact@v7
         with:
