@@ -25,6 +25,8 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `codex-team-config.md` — チームで共有するCodexのRulesと設定の雛形、層の重なりと信頼の条件、Claude Codeとの対応
   - `task-design.md` — エージェントへの依頼に必要な情報、タスクの分割、Plan modeとGoal modeの使い分け
   - `codex-execution-steering.md` — 実行中の追加指示、中断、委任できる検証環境の整え方
+  - [mobile-rebuild-verification.md](docs/mobile-rebuild-verification.md) — モバイル再構築のCLI検証、worktree、実機の受け入れ
+  - [codex-browser-and-store-review.md](docs/codex-browser-and-store-review.md) — コードと申請画面の照合、ブラウザのログイン状態と外部操作の確認
   - `codex-plan-mode.md` — Plan modeで調査、意図合わせ、実装方針のレビューを進める判断基準
   - `spec-driven-development.md` — AI協働開発のための仕様駆動ワークフロー、docs / .steering の使い分け
   - `spec-kit-practice.md` — Spec Kitで要求を具体化し、計画と検証を対応付ける方法
@@ -55,6 +57,9 @@ Skill は Markdown とディレクトリだけで構成するため、同じ Ski
   - `cognitive-rhythm-writing/` — 長文解説に読み進める推進力を持たせる認知リズム設計（出典 [k16shikano 氏の gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) の要旨を再構成。japanese-tech-writing と併用）
   - `explain-diff/` — コードの変更を背景 → 直感 → コードの順の解説文書にし、チャットの自由記述クイズで理解を確かめる（出典 [Geoffrey Litt の gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524) を日本語とチャットのクイズに合わせて再構成）
 - **templates/** — リポジトリにコピーして使う雛形
+  - [task-design/feature-handoff.md](templates/task-design/feature-handoff.md) — 既存実装の調査結果を4要素の機能追加依頼へ引き継ぐ
+  - [mobile-rebuild/acceptance-contract.md](templates/mobile-rebuild/acceptance-contract.md) — 1機能の再構築で残す動作、比較方法、受け入れの証拠
+  - [mobile-rebuild/platform-port.md](templates/mobile-rebuild/platform-port.md) — 移植元の仕様抽出、参考実装、共通ロジックとOS固有UIの比較
   - `github-actions/` `github-issue/` — Issue から提案書の PR を作るワークフロー（Codex 版 / Claude Code 版）、プロンプト、Issue の雛形
 - **.claude/** — Claude Code の設定と言語別ガイドライン
   - `commands/` — カスタムスラッシュコマンド
