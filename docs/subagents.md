@@ -74,6 +74,28 @@ Codex での使い方と設定は [codex-subagents.md](codex-subagents.md) に�
 判断が要る点は、候補、それぞれの出どころ、注意点を構造化して返し、判断はメインのエージェントが引き取ってユーザーに確かめる。
 サブエージェントが途中で質問すると、会話の文脈を持たないまま判断を求めることになり、メインの会話とも食い違う。
 
+### レビューの対象を commit に固定する
+
+並列のセッションが同じ作業ツリーを使うと、別のセッションがブランチを切り替え、レビュアーが変更の入っていないコードを読むことがある
+AI のレビュアーは間違った対象を読んでも結果を自信を持って返すので、結果の文面からは気づけない
+レビューを頼む側は、作業ツリーではなく commit の SHA と差分の範囲を渡す
+
+```bash
+git rev-parse HEAD                 # 渡す SHA
+git diff --stat <base>...<SHA>     # 渡す範囲
+```
+
+レビュアーは SHA を通してだけ読む
+
+```bash
+git diff <base>...<SHA>            # 差分
+git show <SHA>:<path>              # その commit の時点のファイル全体
+git worktree add --detach <dir> <SHA>   # テストを流すときは SHA で別の worktree を作る
+```
+
+commit した側は、commit のたびに `git show --stat` でファイル名と行数を見て、入れたはずのファイルが入っているか確かめる
+出典は LayerX エンジニアブログ「AI が書き、レビューし、QA する開発で、私は『監督』の役割を考え始めた」（2026-10-21）https://tech.layerx.co.jp/entry/engineer-as-director
+
 ## MCP / Skills / サブエージェントの使い分け
 
 | 方式 | コンテキスト | 適するタスク |
