@@ -1,0 +1,16 @@
+# hook を使えないときだけ入れる。prefix では --reviewer の有無を見られないので、PR の作成と編集の全部で確認が出る
+prefix_rule(
+    pattern = ["gh", "pr", ["create", "new", "edit"]],
+    decision = "prompt",
+    justification = "レビュー依頼の --reviewer / --add-reviewer は引数のどこにでも書けるので、PR の作成と編集の全部を利用者が確かめる",
+    match = [
+        "gh pr create --title fix --reviewer alice",
+        "gh pr new -r alice",
+        "gh pr edit 12 --add-reviewer alice",
+        "gh pr edit 12 --title fix",
+    ],
+    not_match = [
+        "gh pr view 12",
+        "gh pr -R octo/app edit 12 --add-reviewer alice",
+    ],
+)

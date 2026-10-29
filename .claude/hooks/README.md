@@ -10,6 +10,12 @@
 
 `.claude/settings.json` で登録済み。git commit 以外のコマンド、JSON でない入力、git 差分が取れない場合は通す。検出スクリプト自身はパターン文字列を含むため、スキャン対象から除外している。
 
+### gh-confirm（レビュー依頼とマージの確認）
+
+`tools/gh-confirm/gh_confirm.py` は PreToolUse(Bash) で動く。`gh pr edit --add-reviewer` / `gh pr create --reviewer` / `gh pr merge` と、同じ操作をする `gh api` の呼び出しを見つけたら、`permissionDecision: "ask"` と、対象の PR と依頼先を並べた理由を返し、利用者に確認の画面を出させる。`&&` / `$( )` / `bash -c` などで包んだ形も見つけ、`echo` の引数やヒアドキュメントの本文では止めない。
+
+`.claude/settings.json` で登録済み。このリポジトリには Renovate の PR が届き、エージェントがマージを頼まれうるため。Codex 向けの入れ方と限界は `tools/gh-confirm/README.md` にある。
+
 ## Configuration
 
 Add hooks to `.claude/settings.json`:

@@ -1,0 +1,14 @@
+# hook と一緒に入れてよい。hook が効いていれば hook が先に止めるので、この確認は出ない
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "prompt",
+    justification = "マージは利用者が決める。--auto も条件が揃った時点で確認なしにマージされるので、同じく確かめる",
+    match = [
+        "gh pr merge 12 --squash",
+        "gh pr merge --auto 12",
+    ],
+    not_match = [
+        "gh pr view 12",
+        "gh pr --repo octo/app merge 12",
+    ],
+)
