@@ -16,6 +16,35 @@
 
 `.claude/settings.json` で登録済み。このリポジトリには Renovate の PR が届き、エージェントがマージを頼まれうるため。Codex 向けの入れ方と限界は `tools/gh-confirm/README.md` にある。
 
+### go-build-overwrite-guard（追跡外のファイルを go build で上書きしない）
+
+`go-build-overwrite-guard.py` は PreToolUse(Bash) で動く。`-o` の無い `go build` が、`.` / `./cmd/foo` / `../x` のような相対のパスで1つの main のパッケージを指すとき、書き出す先（基準のディレクトリにパッケージのディレクトリ名、そのディレクトリに go.mod があれば module の最後の要素）を推定する。そこに git で追跡されていない既存のファイルがあれば exit 2 で止め、そのファイルの絶対パスと、`go vet` か `go build -o <別の場所>` を使う書き方を Claude へ返す。基準は入力の `cwd` で、前の `cd <dir> &&` と `-C <dir>` も読む。`-o` がある、パッケージが複数か `...` を含む、`go run` / `go vet` / `go test`、main でないパッケージ、追跡されているファイルか無視の対象のファイル、git のリポジトリの外、サブシェルと変数の展開を含む形は止めない。追跡されていれば git で戻せ、無視の対象はそのリポジトリが成果物として扱っているため。`go build ./...` が main を1つだけ含むときと `-o <ディレクトリ>` も同じ名前のファイルを書くが、この hook は見ない。
+
+このリポジトリの `.claude/settings.json` には登録していない。使うときは、スクリプトを置き、`.claude/settings.json` か `~/.claude/settings.json` の `PreToolUse` に足す（すでに `"matcher": "Bash"` の項目があれば、その `hooks` の配列に足す）。
+
+```bash
+mkdir -p ~/.claude/hooks
+cp .claude/hooks/go-build-overwrite-guard.py ~/.claude/hooks/
+```
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/go-build-overwrite-guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Configuration
 
 Add hooks to `.claude/settings.json`:
