@@ -1,0 +1,9 @@
+{
+  "permissions": {"allow": ["Bash(git add:*)", "Bash(git commit:*)"], "defaultMode": "auto"},
+  "hooks": {
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "python3 \"$HOME/.claude/hooks/missing-check.py\""}]}
+    ]
+  },
+  "enabledPlugins": {"sample@market": true, "other@market": false}
+}

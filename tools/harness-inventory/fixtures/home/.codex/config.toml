@@ -1,0 +1,16 @@
+model = "sample-model"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+notify = [
+  "notify-tool",
+  "turn-ended",
+]
+
+[mcp_servers.docs]
+url = "https://example.com/mcp"
+
+[mcp_servers.docs.tools.search]
+approval_mode = "approve"
+
+[projects."/srv/sample"]
+trust_level = "trusted"

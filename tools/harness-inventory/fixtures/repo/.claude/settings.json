@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": ["Bash(git status:*)"],
+    "ask": ["Bash(gh pr merge:*)"],
+    "deny": ["Bash(rm -rf:*)"]
+  },
+  "hooks": {
+    "SessionStart": [
+      {"hooks": [{"type": "command", "command": "bash .claude/hooks/load-context.sh"}]}
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/secret_guard.py\""}]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "tool == \"Edit\"",
+        "hooks": [{"type": "command", "command": "npx -y sample-formatter@1.2.0 --hook"}]
+      }
+    ],
+    "Stop": [
+      {"hooks": [{"type": "prompt", "prompt": "Check that every claim in the answer has evidence"}]}
+    ],
+    "Notification": [
+      {"hooks": [{"type": "command", "command": "say done"}]}
+    ]
+  }
+}
