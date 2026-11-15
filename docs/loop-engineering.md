@@ -11,6 +11,41 @@ tags: [loop-engineering, claude-code, automation, worktree, subagents, state-man
 Loop Engineering は、AI コーディングエージェントへの個別プロンプト作成から、「エージェントを継続的に指示する自動化ループの構築」へ焦点を移す方法論である。
 Boris Cherny の「I don't prompt Claude anymore. I have loops running that prompt Claude」が中核の哲学で、cobusgreyling/loop-engineering がパターン集 + CLI + テンプレートとして体系化した。
 ループ自体を LOOP.md（宣言）と STATE.md（状態）で管理し、L1（レポートのみ）→ L2（支援修正）→ L3（無人化）と段階展開する。
+Anthropic はループを、次のサイクルを始めるきっかけで Turn-based / Goal-based / Time-based / Proactive の4つに分けている。きっかけの軸は、L1〜L3 の書き込みの範囲の軸とは別に決める。
+
+## ループの4つの型
+
+Anthropic の記事「Loop engineering: Getting started with loops」（2026-06-30）は、ループを次のサイクルを始めるきっかけで4つに分ける。
+Claude Code の機能の列は、記事ではなく公式ドキュメントから当てはめたもの。
+
+| 型 | 次のサイクルを始めるもの | Claude Code の機能 |
+|---|---|---|
+| Turn-based | 人が毎ターン指示し、確かめ方を渡す | 通常のプロンプト、検証用の skill |
+| Goal-based | ゴールを渡し、未達の間は続ける | `/goal <条件>`、止まるのを阻む Stop hook |
+| Time-based | 決まった間隔か時刻 | `/loop 5m`、間隔を省いた `/loop`、`/schedule` の scheduled tasks、GitHub Actions の `schedule` |
+| Proactive | 人がその場にいない状態での、イベントかスケジュール | scheduled tasks の GitHub trigger と API trigger、GitHub Actions の automation mode |
+
+- 記事の Proactive は、起動の条件に「event or schedule」と書き、スケジュールも含める。Time-based との境は、起動したときに人がその場にいるかどうかで、間隔か時刻かでは分かれない。
+- Slack でのメンションは人の操作で始まるので、Proactive には当たらない。
+
+### きっかけと書き込みの範囲を分ける
+
+4つの型は、何が次のサイクルを始めるかを決める。
+L1〜L3 は、そのサイクルに何を書き込ませるかを決める。
+2つは独立していて、Proactive に起動しても L1（報告だけ）にとどめられる。
+このリポジトリの docs-triage は、Time-based で L1 にあたる。
+「イベントで起動するが、マージは人がする」のような設計は、2つの軸を分けて書くと表せる。
+
+### ゴールを判定する役
+
+| 道具 | 判定する役 | 止まる条件 |
+|---|---|---|
+| Claude Code の `/goal` | 作業とは別の小さなモデル。会話だけを読み、コマンドもファイルも見ない | 達成 / 不可能の判定、条件の文に書いた上限（「20ターンで止める」など） |
+| Codex の `/goal`（v0.128.0、`[features] goals = true`） | 作業しているモデル自身 | 達成したとモデルが確信したとき |
+| 自作の Stop hook | hook のスクリプト。テストを走らせて決定的に判定できる | `decision: "block"` を返さなくなったとき。8回続けて阻むと打ち切られる（`CLAUDE_CODE_STOP_HOOK_BLOCK_CAP` で変えられる） |
+
+Claude Code の判定役は会話しか読まないので、テストを走らせた出力が会話に残っていないと、達成を確かめられない。
+テストの合否で止めたいゴールは、Stop hook でテストを走らせる形のほうが確実に判定できる。
 
 ## 5 つの構成要素
 
@@ -97,3 +132,10 @@ Implementer と Verifier の分離（メーカー / チェッカー）、Human G
 ## 参考
 
 - cobusgreyling/loop-engineering — https://github.com/cobusgreyling/loop-engineering
+- Loop engineering: Getting started with loops — https://claude.com/resources/articles/getting-started-with-loops
+- Keep Claude working toward a goal — https://code.claude.com/docs/en/goal
+- Run prompts on a schedule — https://code.claude.com/docs/en/scheduled-tasks
+- Automate work with scheduled tasks — https://code.claude.com/docs/en/routines
+- Claude Code GitHub Actions — https://code.claude.com/docs/en/github-actions
+- Hooks reference — https://code.claude.com/docs/en/hooks
+- Using Goals in Codex — https://developers.openai.com/cookbook/examples/codex/using_goals_in_codex

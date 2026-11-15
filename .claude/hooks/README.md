@@ -168,15 +168,19 @@ Exit code 2 でフィードバックを返して作業を継続させる。
 {
   "hooks": {
     "PostToolUse": [{
-      "matcher": "Edit",
+      "matcher": "Edit|Write",
       "hooks": [{
         "type": "command",
-        "command": "npx prettier --write {{filePath}}"
+        "command": "f=$(jq -r '.tool_input.file_path') && npx prettier --write --ignore-unknown \"$f\""
       }]
     }]
   }
 }
 ```
+
+編集したファイルのパスは、stdin の JSON の `tool_input.file_path` で届く。コマンドの文字列に `{{filePath}}` のような置換は無い。
+`ruff format .` のようにリポジトリ全体を整形すると、編集していないファイルにも差分が出るので、届いたパスだけを整形する。
+Bash で書き換えたファイルは PostToolUse では拾えない。
 
 ### Pre-commit lint
 

@@ -186,6 +186,21 @@ THE SYSTEM SHALL 未完了タスクだけを一覧に表示する
 
 この形は EARS に近い制約つき自然言語で、人間にもAIにも解釈しやすい。
 
+### 規則をテストと ID で結び、読み方が割れる入力で確かめる
+
+仕様のファイルは、規則とその理由を残す。
+テストは、規則に反した変更を見つける。
+2つを同じ ID（`SHIP-1` など）で結んでおくと、テストが落ちたときにエージェントが ID から仕様を引き、コードとテストのどちらを直すかを決められる。
+
+テストの入力は、規則の読み方が2つあり得るとき、結果が割れる値を選ぶ。
+「合計5,000円以上で送料無料、税込で判定する（端数は切り捨て）」なら、税抜4,546円（税込5,000円）は税込なら無料、税抜なら有料で、取り違えを見つけられる。
+税抜10,000円はどちらの読み方でも無料なので、税抜で判定する実装に変えても通ってしまう。
+端数の扱いも規則に書く。税抜4,545円は、切り捨てなら税込4,999円で有料、四捨五入なら5,000円で無料になる。
+
+ID の結び目が切れていないかは `tools/spec-trace/` で数える。
+ただし ID で結べていても、上の10,000円のテストのように規則を押さえていないことがある。テストが規則を押さえているかは、mutation testing（わざと誤った実装に替えてテストが落ちるかを見る）で確かめる。
+AI が書いたテストは、誤った実装を見抜けないことが多い。SWE-Mutation（2026年5月）では、最良のモデルでも検出率は36.15%だった。
+
 ## 承認ゲート
 
 スペック駆動では、いきなり実装へ進まない。
@@ -342,3 +357,5 @@ Vibe Coding は発見速度、SDD は本番の耐久性を提供する、とい�
 - Tessl spec-as-source — https://tessl.io/blog/tessl-launches-spec-driven-framework-and-registry/
 - Spec-First / Spec-Anchored / Spec-as-Truth（3 段階分類の原典） — https://www.rushis.com/spec-first-spec-anchored-spec-as-truth-the-three-levels-of-spec-driven-development/
 - 変更し続けられるシステムをどう保つか — AI 時代の SSoT という設計原則（Dress Code、AI DevEx Conference 2026） — https://speakerdeck.com/kawauso/bian-geng-sisok-kerarerusisutemuwodoubao-tuka-aishi-dai-nossottoiushe-ji-yuan-ze
+- SWE-Mutation — https://arxiv.org/abs/2605.22175
+- Mutation testing（Thoughtworks Technology Radar） — https://www.thoughtworks.com/radar/techniques/mutation-testing
