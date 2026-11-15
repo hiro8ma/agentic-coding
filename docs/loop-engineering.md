@@ -25,7 +25,7 @@ Claude Code の機能の列は、記事ではなく公式ドキュメントか�
 | Time-based | 決まった間隔か時刻 | `/loop 5m`、間隔を省いた `/loop`、`/schedule` の scheduled tasks、GitHub Actions の `schedule` |
 | Proactive | 人がその場にいない状態での、イベントかスケジュール | scheduled tasks の GitHub trigger と API trigger、GitHub Actions の automation mode |
 
-- 記事の Proactive は、起動の条件に「event or schedule」と書き、スケジュールも含める。Time-based との境は、起動したときに人がその場にいるかどうかで、間隔か時刻かでは分かれない。
+- 記事の Proactive は、起動の条件に「event or schedule, with no human in real time」と書き、スケジュールでの起動も含める。一方で記事は `/schedule` を Time-based に挙げている。人のいない定時の起動はどちらとも読め、2つの境ははっきりしない。
 - Slack でのメンションは人の操作で始まるので、Proactive には当たらない。
 
 ### きっかけと書き込みの範囲を分ける
@@ -33,7 +33,7 @@ Claude Code の機能の列は、記事ではなく公式ドキュメントか�
 4つの型は、何が次のサイクルを始めるかを決める。
 L1〜L3 は、そのサイクルに何を書き込ませるかを決める。
 2つは独立していて、Proactive に起動しても L1（報告だけ）にとどめられる。
-このリポジトリの docs-triage は、Time-based で L1 にあたる。
+このリポジトリの docs-triage は、週1回の定時に人のいない場所で起動し（Time-based とも Proactive とも読める）、書き込みは L1 にとどめている。
 「イベントで起動するが、マージは人がする」のような設計は、2つの軸を分けて書くと表せる。
 
 ### ゴールを判定する役
