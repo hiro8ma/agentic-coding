@@ -1,0 +1,4 @@
+feat: 架空商事様のオーダーの画面を直す
+
+発注の仕様は同様のまま、`master` の設定と https://example.com/master/docs は変えない
+サーバの設定は master に入れてから直す
