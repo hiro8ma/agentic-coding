@@ -593,6 +593,14 @@ class ExtractTest(unittest.TestCase):
             "メッセージを付けない git commit": ("git commit", []),
             "--amend --no-edit": ("git commit --amend --no-edit", []),
             "-C で前のコミットのメッセージを使う": ("git commit -C HEAD", []),
+            "-C に続けた前のコミットの名前をメッセージに数えない": (
+                "git commit -Cmain",
+                [],
+            ),
+            "-t に続けたテンプレートの名前をメッセージに数えない": (
+                "git commit -tmy.txt",
+                [],
+            ),
             "git commit 以外の -m": ("git merge -m 架空商事様 topic", []),
             "git log の -m": ("git log -m", []),
             "gh pr view": ("gh pr view 12", []),
