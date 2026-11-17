@@ -6,16 +6,20 @@ Usage:
     python3 term_check.py lint --glossary glossary.md --target commit --json msg.txt
     git log -1 --format=%B | python3 term_check.py lint --glossary g.md --target commit -
     python3 term_check.py glossary --glossary glossary.md
+    python3 term_check.py review --glossary glossary.md --today 2026-11-17
     python3 term_check.py hook --glossary glossary.md          # Claude Code の PreToolUse(Bash)
     python3 term_check.py hook --glossary glossary.md --codex  # Codex の PreToolUse(Bash)
 
-用語集は「使う語 / 使わない語 / 除く語 / 対象 / 使う場面 / 期待する判断」の列を持つ Markdown の表。
+用語集は「使う語 / 使わない語 / 除く語 / 対象 / 使う場面 / 期待する判断」の列と、任意の「見直す日」の列を持つ Markdown の表。
 lint は、出し先に当てはまる行の使わない語を、フェンスとインラインコードと URL の外から探す。
 glossary は、各行に使う場面と期待する判断が書いてあるかを確かめる。
+review は、見直す日（YYYY-MM-DD）が基準の日以前の行を並べる。見直す日は review だけが読む。
 hook は、git commit のメッセージと gh pr create / edit のタイトルと本文を取り出して lint と同じ規則で調べ、
 当たれば deny を返す。用語集やコマンドを読めないときは、何も出さずに終了コード0で通す。
 終了コードは、lint は当たりが無ければ0、あれば1（--report-only なら0）、
-glossary は欠けが無ければ0、あれば1。どちらも入力か用語集を読めなければ2。hook は常に0。
+glossary は欠けが無ければ0、あれば1、review は見直す日が来た行が無ければ0、あれば1
+（--require-date なら見直す日の無い行も1に数える）。
+どれも入力か用語集を読めなければ2（review は見直す日を日付として読めない行があっても2）。hook は常に0。
 Python 3.9以降の標準ライブラリだけで動く。
 """
 
@@ -28,6 +32,7 @@ import re
 import shlex
 import sys
 from dataclasses import dataclass
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 COMMIT = "commit"
@@ -44,6 +49,7 @@ TARGETS = "対象"
 SCENE = "使う場面"
 JUDGMENT = "期待する判断"
 COLUMNS = (USE, AVOID, EXCEPT, TARGETS, SCENE, JUDGMENT)
+REVIEW = "見直す日"
 SEPARATOR = " / "
 CONTEXT = 20
 
@@ -53,6 +59,8 @@ _URL = re.compile(r"https?://[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+")
 _TABLE_ROW = re.compile(r"^\s*\|")
 _DELIMITER_CELL = re.compile(r"^:?-+:?$")
 _PIPE = re.compile(r"(?<!\\)\|")
+# date.fromisoformat は Python の版で受ける形が違い、\d は全角の数字も読むので、半角の形を先に決める
+_ISO_DATE = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})")
 
 
 class GlossaryError(ValueError):
@@ -68,6 +76,7 @@ class Rule:
     targets: tuple[str, ...]
     scene: str
     judgment: str
+    review: str = ""
 
     def applies(self, target: str) -> bool:
         return target in self.targets or ALL in self.targets
@@ -159,7 +168,14 @@ def _rule(line: int, cells: dict[str, str]) -> Rule:
     if not use and not avoid:
         raise GlossaryError(f"{line}行目: {USE}も{AVOID}も無い")
     return Rule(
-        line, use, avoid, _terms(cells[EXCEPT]), targets, cells[SCENE], cells[JUDGMENT]
+        line,
+        use,
+        avoid,
+        _terms(cells[EXCEPT]),
+        targets,
+        cells[SCENE],
+        cells[JUDGMENT],
+        cells.get(REVIEW, ""),
     )
 
 
@@ -188,6 +204,8 @@ def parse_glossary(text: str) -> list[Rule]:
                 f"{i + 1}行目: 表の見出しに {' / '.join(absent)} が無い"
             )
         index = {name: header.index(name) for name in COLUMNS}
+        if REVIEW in header:
+            index[REVIEW] = header.index(REVIEW)
         i += 2
         while i < len(lines) and not fenced[i] and _TABLE_ROW.match(lines[i]):
             cells = _cells(lines[i])
@@ -197,7 +215,7 @@ def parse_glossary(text: str) -> list[Rule]:
                 )
             if any(cells):
                 rules.append(
-                    _rule(i + 1, {name: cells[index[name]] for name in COLUMNS})
+                    _rule(i + 1, {name: cells[col] for name, col in index.items()})
                 )
             i += 1
     if not found:
@@ -212,6 +230,38 @@ def load_glossary(path: str) -> list[Rule]:
     except (OSError, UnicodeDecodeError) as error:
         raise GlossaryError(f"読めない: {path}: {error}") from error
     return parse_glossary(text)
+
+
+def parse_date(text: str) -> date | None:
+    """半角の YYYY-MM-DD で、暦にある日だけを読む。ほかは None"""
+    found = _ISO_DATE.fullmatch(text)
+    if not found:
+        return None
+    try:
+        return date(*(int(part) for part in found.groups()))
+    except ValueError:
+        return None
+
+
+def review_rules(
+    rules: list[Rule], today: date
+) -> tuple[list[tuple[Rule, date]], list[Rule], list[str]]:
+    """見直す日が today 以前の行 / 見直す日の無い行 / 見直す日を日付として読めない行の誤りを返す"""
+    due: list[tuple[Rule, date]] = []
+    undated: list[Rule] = []
+    errors: list[str] = []
+    for rule in rules:
+        if not rule.review:
+            undated.append(rule)
+            continue
+        when = parse_date(rule.review)
+        if when is None:
+            errors.append(
+                f"{rule.line}行目: {REVIEW}「{rule.review}」は YYYY-MM-DD の日付でない"
+            )
+        elif when <= today:
+            due.append((rule, when))
+    return due, undated, errors
 
 
 def _blank(found: re.Match[str]) -> str:
@@ -825,6 +875,34 @@ def render_glossary(rules: list[Rule]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_review(
+    rules: list[Rule],
+    due: list[tuple[Rule, date]],
+    undated: list[Rule],
+    today: date,
+    require_date: bool,
+) -> str:
+    lines = [
+        "# term-check review",
+        "",
+        (
+            f"基準の日 {today.isoformat()} / 規則{len(rules)}件"
+            f" / {REVIEW}が来た{len(due)}件 / {REVIEW}の無い{len(undated)}件"
+        ),
+    ]
+    if due:
+        lines += ["", f"## {REVIEW}が来た規則", ""]
+    for rule, when in due:
+        days = (today - when).days
+        passed = f"{days}日過ぎた" if days else "当日"
+        lines.append(f"- {rule.line}行目 {rule.label()}")
+        lines.append(f"  - {REVIEW} {when.isoformat()}（{passed}）")
+    if require_date and undated:
+        lines += ["", f"## {REVIEW}の無い規則", ""]
+        lines += [f"- {rule.line}行目 {rule.label()}" for rule in undated]
+    return "\n".join(lines) + "\n"
+
+
 def build_reason(found: list[tuple[Message, Hit]]) -> str:
     lines = ["用語集で使わない語を含む"]
     for message, hit in found:
@@ -928,6 +1006,33 @@ def run_glossary(args: argparse.Namespace) -> int:
     return 1 if any(rule.missing() for rule in rules) else 0
 
 
+def _today() -> date:
+    return datetime.now(timezone.utc).astimezone().date()
+
+
+def run_review(args: argparse.Namespace) -> int:
+    try:
+        rules = load_glossary(args.glossary)
+    except GlossaryError as error:
+        print(f"term-check: 用語集: {error}", file=sys.stderr)
+        return 2
+    today = args.today or _today()
+    due, undated, errors = review_rules(rules, today)
+    if errors:
+        for error in errors:
+            print(f"term-check: 用語集: {error}", file=sys.stderr)
+        return 2
+    sys.stdout.write(render_review(rules, due, undated, today, args.require_date))
+    return 1 if due or (args.require_date and undated) else 0
+
+
+def _date_argument(text: str) -> date:
+    when = parse_date(text)
+    if when is None:
+        raise argparse.ArgumentTypeError(f"YYYY-MM-DD の日付でない: {text}")
+    return when
+
+
 def run_hook(args: argparse.Namespace) -> int:
     try:
         payload = json.load(sys.stdin)
@@ -993,6 +1098,25 @@ def build_parser() -> argparse.ArgumentParser:
         "--glossary", required=True, help="用語集の Markdown のファイル"
     )
     glossary.set_defaults(func=run_glossary)
+
+    review = commands.add_parser(
+        "review", help="見直す日が基準の日以前の、用語集の行を並べる"
+    )
+    review.add_argument(
+        "--glossary", required=True, help="用語集の Markdown のファイル"
+    )
+    review.add_argument(
+        "--today",
+        type=_date_argument,
+        metavar="YYYY-MM-DD",
+        help="基準の日（既定は、この機械の地方時の今日）",
+    )
+    review.add_argument(
+        "--require-date",
+        action="store_true",
+        help="見直す日の無い行も並べ、あれば終了コード1を返す",
+    )
+    review.set_defaults(func=run_review)
 
     hook = commands.add_parser("hook", help="PreToolUse(Bash) の hook として動く")
     hook.add_argument("--glossary", required=True, help="用語集の Markdown のファイル")

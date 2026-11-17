@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest import mock
 
@@ -24,6 +25,7 @@ import term_check as tc
 FIXTURES = HERE / "fixtures"
 GLOSSARY = FIXTURES / "glossary.md"
 INCOMPLETE = FIXTURES / "incomplete_glossary.md"
+REVIEW_GLOSSARY = FIXTURES / "review_glossary.md"
 TEXTS = FIXTURES / "texts"
 COMMIT_MESSAGE = TEXTS / "commit_message.txt"
 NOTES = TEXTS / "notes.md"
@@ -42,6 +44,10 @@ COMPOUNDS = (
     "異様",
 )
 HEADER = "| 使う語 | 使わない語 | 除く語 | 対象 | 使う場面 | 期待する判断 |\n|---|---|---|---|---|---|\n"
+REVIEW_HEADER = (
+    "| 使う語 | 使わない語 | 除く語 | 対象 | 使う場面 | 期待する判断 | 見直す日 |\n"
+    "|---|---|---|---|---|---|---|\n"
+)
 
 
 def run(*args: str, stdin: str = "") -> tuple[int, str, str]:
@@ -455,6 +461,299 @@ class GlossaryTest(unittest.TestCase):
                 self.fail(f"BOM の付いた用語集を読めなかった: {error}")
         self.assertEqual(text[0], "\ufeff")
         self.assertEqual([(r.line, r.avoid) for r in rules], [(3, ("オーダー",))])
+
+
+class ReviewTest(unittest.TestCase):
+    def review(self, *args: str, glossary: Path = REVIEW_GLOSSARY) -> tuple:
+        return run("review", "--glossary", str(glossary), *args)
+
+    def test_reading_the_review_column(self) -> None:
+        testCases = {
+            "見直す日の列を名前で読み、列の順は問わない": {
+                "text": "| 見直す日 | 対象 | 使わない語 | 使う語 | 期待する判断 | 除く語 | 使う場面 |\n"
+                "|---|---|---|---|---|---|---|\n"
+                "| 2026-11-17 | docs | オーダー | 発注 | 判断 | オーダーメイド | 場面 |\n",
+                "want": [(3, ("発注",), ("オーダー",), "場面", "判断", "2026-11-17")],
+            },
+            "見直す日の列の無い表の行は、見直す日を空にする": {
+                "text": REVIEW_HEADER
+                + "| 発注 | オーダー | | all | 場面 | 判断 | 2026-11-17 |\n\n"
+                + HEADER
+                + "| サーバー | サーバ | | all | 場面 | 判断 |\n",
+                "want": [
+                    (3, ("発注",), ("オーダー",), "場面", "判断", "2026-11-17"),
+                    (7, ("サーバー",), ("サーバ",), "場面", "判断", ""),
+                ],
+            },
+            "見直す日の前後の空白は外す": {
+                "text": REVIEW_HEADER
+                + "| 発注 | オーダー | | all | 場面 | 判断 |   2026-11-17   |\n",
+                "want": [(3, ("発注",), ("オーダー",), "場面", "判断", "2026-11-17")],
+            },
+        }
+        for tn, tcase in testCases.items():
+            with self.subTest(tn):
+                rules = parsed(self, tcase["text"])
+                got = [
+                    (r.line, r.use, r.avoid, r.scene, r.judgment, r.review)
+                    for r in rules
+                ]
+                self.assertEqual(got, tcase["want"])
+
+    def test_due_boundary(self) -> None:
+        rules = parsed(
+            self,
+            REVIEW_HEADER + "| 発注 | オーダー | | all | 場面 | 判断 | 2026-11-17 |\n",
+        )
+        testCases = {
+            "見直す日の前日は並べない": {"today": date(2026, 11, 16), "want": []},
+            "見直す日の当日は並べる": {
+                "today": date(2026, 11, 17),
+                "want": [(3, date(2026, 11, 17))],
+            },
+            "見直す日の翌日は並べる": {
+                "today": date(2026, 11, 18),
+                "want": [(3, date(2026, 11, 17))],
+            },
+            "見直す日から年をまたいだ日も並べる": {
+                "today": date(2027, 1, 1),
+                "want": [(3, date(2026, 11, 17))],
+            },
+        }
+        for tn, tcase in testCases.items():
+            with self.subTest(tn):
+                due, undated, errors = tc.review_rules(rules, tcase["today"])
+                got = [(rule.line, when) for rule, when in due]
+                self.assertEqual((got, undated, errors), (tcase["want"], [], []))
+
+    def test_example_review(self) -> None:
+        due = (
+            "\n## 見直す日が来た規則\n\n"
+            "- 8行目 使う語「発注」 / 使わない語「オーダー」\n"
+            "  - 見直す日 2026-11-16（1日過ぎた）\n"
+            "- 9行目 使う語「見積書」 / 使わない語「見積もり書 / 御見積書」\n"
+            "  - 見直す日 2026-11-17（当日）\n"
+        )
+        undated = "\n## 見直す日の無い規則\n\n- 11行目 使う語「main」 / 使わない語「master」\n"
+        testCases = {
+            "見直す日が来た行を並べて1": {
+                "args": ["--today", "2026-11-17"],
+                "code": 1,
+                "out": "# term-check review\n\n"
+                "基準の日 2026-11-17 / 規則4件 / 見直す日が来た2件 / 見直す日の無い1件\n"
+                + due,
+            },
+            "--require-date なら見直す日の無い行も並べる": {
+                "args": ["--today", "2026-11-17", "--require-date"],
+                "code": 1,
+                "out": "# term-check review\n\n"
+                "基準の日 2026-11-17 / 規則4件 / 見直す日が来た2件 / 見直す日の無い1件\n"
+                + due
+                + undated,
+            },
+            "見直す日が来た行が無ければ、見直す日の無い行があっても0": {
+                "args": ["--today", "2026-11-15"],
+                "code": 0,
+                "out": "# term-check review\n\n"
+                "基準の日 2026-11-15 / 規則4件 / 見直す日が来た0件 / 見直す日の無い1件\n",
+            },
+            "--require-date なら見直す日の無い行だけでも1": {
+                "args": ["--today", "2026-11-15", "--require-date"],
+                "code": 1,
+                "out": "# term-check review\n\n"
+                "基準の日 2026-11-15 / 規則4件 / 見直す日が来た0件 / 見直す日の無い1件\n"
+                + undated,
+            },
+            "日が過ぎた数を数える": {
+                "args": ["--today", "2026-11-18"],
+                "code": 1,
+                "out": "# term-check review\n\n"
+                "基準の日 2026-11-18 / 規則4件 / 見直す日が来た3件 / 見直す日の無い1件\n\n"
+                "## 見直す日が来た規則\n\n"
+                "- 8行目 使う語「発注」 / 使わない語「オーダー」\n"
+                "  - 見直す日 2026-11-16（2日過ぎた）\n"
+                "- 9行目 使う語「見積書」 / 使わない語「見積もり書 / 御見積書」\n"
+                "  - 見直す日 2026-11-17（1日過ぎた）\n"
+                "- 10行目 使う語「サーバー」 / 使わない語「サーバ」\n"
+                "  - 見直す日 2026-11-18（当日）\n",
+            },
+        }
+        for tn, tcase in testCases.items():
+            with self.subTest(tn):
+                code, out, err = self.review(*tcase["args"])
+                self.assertEqual((code, out, err), (tcase["code"], tcase["out"], ""))
+
+    def test_six_column_glossary(self) -> None:
+        summary = (
+            "# term-check review\n\n"
+            "基準の日 2026-11-17 / 規則5件 / 見直す日が来た0件 / 見直す日の無い5件\n"
+        )
+        testCases = {
+            "全部の行を見直す日の無い行に数えて0": {
+                "args": [],
+                "code": 0,
+                "out": summary,
+            },
+            "--require-date なら全部の行を並べて1": {
+                "args": ["--require-date"],
+                "code": 1,
+                "out": summary
+                + "\n## 見直す日の無い規則\n\n"
+                + "".join(f"- {rule.line}行目 {rule.label()}\n" for rule in RULES),
+            },
+        }
+        for tn, tcase in testCases.items():
+            with self.subTest(tn):
+                code, out, err = self.review(
+                    "--today", "2026-11-17", *tcase["args"], glossary=GLOSSARY
+                )
+                self.assertEqual((code, out, err), (tcase["code"], tcase["out"], ""))
+
+    def test_today_defaults_to_the_local_date(self) -> None:
+        with mock.patch.object(tc, "_today", return_value=date(2026, 11, 16)):
+            code, out, _ = self.review()
+        self.assertEqual(code, 1)
+        self.assertEqual(
+            out.splitlines()[2],
+            "基準の日 2026-11-16 / 規則4件 / 見直す日が来た1件 / 見直す日の無い1件",
+        )
+        self.assertIn("  - 見直す日 2026-11-16（当日）", out.splitlines())
+
+    def test_malformed_dates_exit_2_without_output(self) -> None:
+        testCases = {
+            "斜線で区切った日付": "2026/11/17",
+            "暦に無い日": "2026-02-30",
+            "0で埋めない月と日": "2026-1-5",
+            "区切りの無い日付": "20261117",
+            "全角の数字": "２０２６-１１-１７",
+            "日付の後ろの文字": "2026-11-17まで",
+            "0年": "0000-01-01",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            for tn, value in testCases.items():
+                with self.subTest(tn):
+                    path = Path(directory, "glossary.md")
+                    path.write_text(
+                        REVIEW_HEADER
+                        + "| 発注 | オーダー | | all | 場面 | 判断 | 2026-11-16 |\n"
+                        + f"| 見積書 | 見積もり書 | | docs | 場面 | 判断 | {value} |\n",
+                        encoding="utf-8",
+                    )
+                    code, out, err = self.review(
+                        "--today", "2026-11-17", "--require-date", glossary=path
+                    )
+                    self.assertEqual((code, out), (2, ""))
+                    self.assertEqual(
+                        err,
+                        f"term-check: 用語集: 4行目: 見直す日「{value}」は"
+                        " YYYY-MM-DD の日付でない\n",
+                    )
+
+    def test_every_malformed_date_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory, "glossary.md")
+            path.write_text(
+                REVIEW_HEADER
+                + "| 発注 | オーダー | | all | 場面 | 判断 | 2026/11/16 |\n"
+                + "| サーバー | サーバ | | all | 場面 | 判断 | 2026-11-16 |\n"
+                + "| 見積書 | 見積もり書 | | docs | 場面 | 判断 | 来月 |\n",
+                encoding="utf-8",
+            )
+            code, out, err = self.review("--today", "2026-11-17", glossary=path)
+        self.assertEqual((code, out), (2, ""))
+        self.assertEqual(
+            err.splitlines(),
+            [
+                "term-check: 用語集: 3行目: 見直す日「2026/11/16」は YYYY-MM-DD の日付でない",
+                "term-check: 用語集: 5行目: 見直す日「来月」は YYYY-MM-DD の日付でない",
+            ],
+        )
+
+    def test_other_commands_ignore_the_review_column(self) -> None:
+        rows = [
+            ("| 発注 | オーダー | | all | 場面 | 判断 |", " 2026/12/01 |"),
+            ("| サーバー | サーバ | | docs | 場面 | |", " 2026-11-16 |"),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            six = Path(directory, "six.md")
+            six.write_text(
+                HEADER + "".join(f"{row}\n" for row, _ in rows), encoding="utf-8"
+            )
+            seven = Path(directory, "seven.md")
+            seven.write_text(
+                REVIEW_HEADER + "".join(f"{row}{when}\n" for row, when in rows),
+                encoding="utf-8",
+            )
+            commands = {
+                "lint": (
+                    ["lint", "--target", "docs", "--json", "-"],
+                    "オーダーとサーバ",
+                ),
+                "glossary": (["glossary"], ""),
+                "hook": (["hook"], payload("git commit -m オーダー")),
+            }
+            for tn, (args, stdin) in commands.items():
+                with self.subTest(f"{tn}は見直す日の誤った用語集でも6列と同じに動く"):
+                    got = {}
+                    for path in (six, seven):
+                        code, out, err = run(
+                            args[0], "--glossary", str(path), *args[1:], stdin=stdin
+                        )
+                        got[path.name] = (code, out.replace(path.name, "G"), err)
+                    self.assertEqual(got["seven.md"], got["six.md"])
+                    self.assertNotEqual(got["six.md"][0], 2)
+                    self.assertEqual(got["six.md"][2], "")
+                    self.assertNotIn("見直す日", got["seven.md"][1])
+
+    def test_glossary_errors_exit_2(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            broken = Path(directory, "broken.md")
+            broken.write_text(
+                REVIEW_HEADER
+                + "| 発注 | オーダー | | slack | 場面 | 判断 | 2026-11-17 |\n",
+                encoding="utf-8",
+            )
+            testCases = {
+                "無い用語集": {
+                    "path": Path(directory, "missing.md"),
+                    "err": "term-check: 用語集: 読めない",
+                },
+                "対象の誤った用語集": {
+                    "path": broken,
+                    "err": "term-check: 用語集: 3行目: 対象の「slack」",
+                },
+            }
+            for tn, tcase in testCases.items():
+                with self.subTest(tn):
+                    code, out, err = self.review(
+                        "--today", "2026-11-17", glossary=tcase["path"]
+                    )
+                    self.assertEqual((code, out), (2, ""))
+                    self.assertTrue(err.startswith(tcase["err"]), err)
+
+    def test_argument_errors_exit_2(self) -> None:
+        testCases = {
+            "--glossary が無い": ["review", "--today", "2026-11-17"],
+            "斜線で区切った --today": [
+                "review",
+                "--glossary",
+                str(REVIEW_GLOSSARY),
+                "--today",
+                "2026/11/17",
+            ],
+            "暦に無い --today": [
+                "review",
+                "--glossary",
+                str(REVIEW_GLOSSARY),
+                "--today",
+                "2026-02-30",
+            ],
+        }
+        for tn, args in testCases.items():
+            with self.subTest(tn):
+                with self.assertRaises(SystemExit) as raised:
+                    run(*args)
+                self.assertEqual(raised.exception.code, 2)
 
 
 class ExtractTest(unittest.TestCase):
